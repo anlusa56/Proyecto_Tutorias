@@ -10,7 +10,7 @@ export default function Login({ setUsuario }) {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch("http://localhost:3000/api/usuarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -24,9 +24,9 @@ export default function Login({ setUsuario }) {
       const data = await res.json();
       // data debe tener: token, rol, (y opcional: nombre, id, etc.)
       localStorage.setItem("token", data.token);
-      localStorage.setItem("usuario", JSON.stringify({ rol: data.rol, ...data }));
+      localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
-      setUsuario({ rol: data.rol, ...data });
+      setUsuario(data.usuario);
     } catch (err) {
       setError("Error de conexión con el servidor");
     }
@@ -37,7 +37,7 @@ export default function Login({ setUsuario }) {
       <h2>Iniciar sesión</h2>
       <form onSubmit={handleSubmit}>
         <input
-          type="email"
+          type="email"s
           placeholder="Correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

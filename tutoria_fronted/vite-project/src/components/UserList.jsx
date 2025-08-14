@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react";
-import { getUsers, deleteUser } from "../services/UserService";
+import UserService from "../services/UserService";
 
 export function UserList({ reloadTrigger }) {
   const [users, setUsers] = useState([]);
 
   const loadUsers = async () => {
-    const data = await getUsers();
+    const data = await UserService.getUsers();
     setUsers(data);
   };
 
@@ -18,7 +17,10 @@ export function UserList({ reloadTrigger }) {
       {users.map((user) => (
         <li key={user._id}>
           {user.nombre} - {user.correo} - {user.rol}
-          <button onClick={() => { deleteUser(user._id); loadUsers(); }}>Eliminar</button>
+          <button onClick={async () => {
+            await UserService.deleteUser(user._id);
+            loadUsers();
+          }}>Eliminar</button>
         </li>
       ))}
     </ul>

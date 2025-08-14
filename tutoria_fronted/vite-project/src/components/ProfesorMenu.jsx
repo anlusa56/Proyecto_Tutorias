@@ -1,3 +1,10 @@
+import { UserList } from "./UserList";
+
 export default function ProfesorMenu() {
-  return <div>Componente ProfesorMenu (pendiente de implementar)</div>;
+  return (
+    <div>
+      <h2>Panel del Profesor</h2>
+      <UserList reloadTrigger={0} />
+    </div>
+  );
 }

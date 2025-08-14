@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createUser } from "../services/UserService";
+import UserService from "../services/UserService";
 
 export function UserForm({ onUserCreated }) {
   const [form, setForm] = useState({
@@ -13,7 +13,7 @@ export function UserForm({ onUserCreated }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await createUser(form);
+    await UserService.createUser(form);
     setForm({ nombre: "", correo: "", rol: "estudiante" });
     onUserCreated();
   };

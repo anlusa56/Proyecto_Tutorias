@@ -1,7 +1,7 @@
 // src/services/userService.js
 const API_URL = "http://localhost:3000/api/usuarios"; // cambia según tu backend
 
-export async function getUsuarios() {
+async function getUsers() {
   const token = localStorage.getItem("token");
   const res = await fetch(API_URL, {
     headers: {
@@ -12,7 +12,8 @@ export async function getUsuarios() {
   if (!res.ok) throw new Error("Error al obtener usuarios");
   return await res.json();
 }
-export async function eliminarUsuario(id) {
+
+async function deleteUser(id) {
   const token = localStorage.getItem("token");
   const res = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
@@ -20,5 +21,27 @@ export async function eliminarUsuario(id) {
       Authorization: `Bearer ${token}`,
     },
   });
+  
   return await res.json();
 }
+
+async function createUser(user) {
+  const token = localStorage.getItem("token");
+  const res = await fetch("http://localhost:3000/api/usuarios", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(user),
+  });
+  if (!res.ok) throw new Error("Error al crear usuario");
+  return await res.json();
+}
+
+// Agrega esta exportación por defecto:
+export default {
+  getUsers,
+  deleteUser,
+  createUser,
+};

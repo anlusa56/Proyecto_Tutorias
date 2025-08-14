@@ -2,8 +2,8 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "nombre": "Samuel",
-  "correo": "samuel2@email.com",
-  "contraseña": "12345678",
-  "rol": "estudiante_tutor"
+  "nombre": "ana",
+  "correo": "analarana@gmail.com",
+  "contraseña": "11223344",
+  "rol": "admin"
 }
