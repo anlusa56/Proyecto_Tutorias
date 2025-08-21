@@ -1,64 +1,74 @@
-import { useState } from "react";
-import UserService from "../services/UserService";
+import React, { useState } from "react";
 
-function Registro() {
-  const [form, setForm] = useState({
-    nombre: "",
-    correo: "",
-    password: "",
-    rol: "tutoriado", // valor por defecto
-  });
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+export default function Registro({ setMostrarRegistro }) {
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
     try {
-      await UserService.registrarUsuario(form);
-      alert("Usuario registrado correctamente. Ahora puedes iniciar sesión.");
-      // Aquí puedes redirigir al login si usas react-router
-      // navigate("/login");
-    } catch (error) {
-      alert("Error al registrar usuario");
+      const res = await fetch("http://localhost:4000/api/usuarios", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        setError(errorData.message || "No se pudo crear el usuario");
+        return;
+      }
+
+      alert("Usuario creado exitosamente!");
+      setMostrarRegistro(false); // vuelve al login
+
+    } catch (err) {
+      console.error(err);
+      setError("Error de conexión con el servidor");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        name="nombre"
-        placeholder="Nombre"
-        value={form.nombre}
-        onChange={handleChange}
-        required
-      />
-      <input
-        name="correo"
-        placeholder="Correo"
-        type="email"
-        value={form.correo}
-        onChange={handleChange}
-        required
-      />
-      <input
-        name="password"
-        placeholder="Contraseña"
-        type="password"
-        value={form.password}
-        onChange={handleChange}
-        required
-      />
-      <select name="rol" value={form.rol} onChange={handleChange}>
-        <option value="admin">Administrador</option>
-        <option value="profesor">Profesor</option>
-        <option value="estudiante_tutor">Tutor</option>
-        <option value="estudiante_tutoriado">Tutoriado</option>
-      </select>
-      <button type="submit">Registrarse</button>
-    </form>
+    <div className="login-container">
+      <div className="login-card">
+        <h1>Registrarse</h1>
+        <form className="login-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Nombre completo"
+            value={formData.name}
+            onChange={e => setFormData({...formData, name: e.target.value})}
+            required
+          />
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={formData.email}
+            onChange={e => setFormData({...formData, email: e.target.value})}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={formData.password}
+            onChange={e => setFormData({...formData, password: e.target.value})}
+            required
+          />
+          <button type="submit">Crear cuenta</button>
+        </form>
+
+        {error && <p>{error}</p>}
+
+        <button
+          type="button"
+          className="register-btn"
+          onClick={() => setMostrarRegistro(false)}
+        >
+          Volver al Login
+        </button>
+      </div>
+    </div>
   );
 }
-
-export default Registro;

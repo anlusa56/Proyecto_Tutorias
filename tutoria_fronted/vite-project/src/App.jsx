@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useEffect, useState } from "react";
 import Login from "./components/Login";
 import Registro from "./pages/Registro";
@@ -18,39 +17,19 @@ function App() {
     }
   }, []);
 
-  useEffect(() => {
-    // Puedes quitar este console.log si ya no lo necesitas
-    // console.log("usuario actualizado:", usuario);
-  }, [usuario]);
-
   if (!usuario) {
     return (
       <div>
         {mostrarRegistro ? (
-          <>
-            <Registro />
-            <p>
-              ¿Ya tienes cuenta?{" "}
-              <button onClick={() => setMostrarRegistro(false)}>
-                Iniciar sesión
-              </button>
-            </p>
-          </>
+          <Registro setMostrarRegistro={setMostrarRegistro} />
         ) : (
-          <>
-            <Login setUsuario={setUsuario} />
-            <p>
-              ¿No tienes cuenta?{" "}
-              <button onClick={() => setMostrarRegistro(true)}>
-                Registrarse
-              </button>
-            </p>
-          </>
+          <Login setUsuario={setUsuario} setMostrarRegistro={setMostrarRegistro} />
         )}
       </div>
     );
   }
 
+  // Switch único para los roles
   switch (usuario.rol) {
     case "admin":
       return <AdminMenu />;
@@ -66,4 +45,3 @@ function App() {
 }
 
 export default App;
-

@@ -1,25 +1,32 @@
+// backend/routes/usuarios.js
 const express = require("express");
 const router = express.Router();
-const Usuario = require("../models/Usuario");
+const Usuario = require("../models/Usuario"); // tu modelo de MongoDB
 
-// GET /api/usuarios
-router.get("/", async (req, res) => {
-  try {
-    const usuarios = await Usuario.find({}, "-contraseña"); // No enviar la contraseña
-    res.json(usuarios);
-  } catch (error) {
-    res.status(500).json({ msg: "Error al obtener usuarios" });
+// Ruta para crear un nuevo usuario
+router.post("/usuarios", async (req, res) => {
+  const { correo, contraseña, rol } = req.body;
+
+  // Validación básica
+  if (!correo || !contraseña || !rol) {
+    return res.status(400).json({ mensaje: "Faltan datos" });
   }
-});
 
-// Eliminar usuario por ID
-router.delete("/:id", async (req, res) => {
   try {
-    const usuario = await Usuario.findByIdAndDelete(req.params.id);
-    if (!usuario) return res.status(404).json({ msg: "Usuario no encontrado" });
-    res.json({ msg: "Usuario eliminado correctamente" });
+    // Verificar si el usuario ya existe
+    const usuarioExistente = await Usuario.findOne({ correo });
+    if (usuarioExistente) {
+      return res.status(400).json({ mensaje: "Usuario ya existe" });
+    }
+
+    // Crear el usuario nuevo
+    const nuevoUsuario = new Usuario({ correo, contraseña, rol });
+    await nuevoUsuario.save();
+
+    res.status(201).json({ mensaje: "Usuario creado correctamente", usuario: nuevoUsuario });
   } catch (error) {
-    res.status(500).json({ msg: "Error al eliminar usuario" });
+    console.error("Error al crear usuario:", error);
+    res.status(500).json({ mensaje: "Error del servidor" });
   }
 });
 

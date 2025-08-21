@@ -5,7 +5,7 @@ export default function TutoriadoMenu() {
 
   useEffect(() => {
     // Ajusta la URL para que el backend devuelva solo las tutorías del tutoriado
-    fetch("http://localhost:3000/api/tutorias/tutoriado", {
+    fetch("http://localhost:4000/api/tutorias/tutoriado", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
