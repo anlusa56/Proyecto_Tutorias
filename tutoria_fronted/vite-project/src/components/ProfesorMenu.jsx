@@ -1,10 +1,13 @@
 import { UserList } from "./UserList";
+import LogoutButton from "./LogoutButton";
 
-export default function ProfesorMenu() {
+function ProfesorMenu() {
   return (
     <div>
-      <h2>Panel del Profesor</h2>
-      <UserList reloadTrigger={0} />
+      <h2>Panel del profesor</h2>
+      <LogoutButton />
     </div>
   );
 }
+
+export default ProfesorMenu;

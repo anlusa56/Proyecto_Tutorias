@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 
 export default function Registro({ setMostrarRegistro }) {
-  const [formData, setFormData] = useState({ name: "", email: "", conraseña: "" });
+  const [formData, setFormData] = useState({
+    nombre: "",
+    correo: "",
+    contraseña: "",
+    rol: "tutoriado", // valor por defecto
+  });
   const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,10 +31,8 @@ export default function Registro({ setMostrarRegistro }) {
       }
 
       alert("Usuario creado exitosamente!");
-      setMostrarRegistro(false); // vuelve al login
-
+      setMostrarRegistro(false);
     } catch (err) {
-      console.error(err);
       setError("Error de conexión con el servidor");
     }
   };
@@ -37,30 +44,37 @@ export default function Registro({ setMostrarRegistro }) {
         <form className="login-form" onSubmit={handleSubmit}>
           <input
             type="text"
+            name="nombre"
             placeholder="Nombre completo"
-            value={formData.name}
-            onChange={e => setFormData({...formData, name: e.target.value})}
+            value={formData.nombre}
+            onChange={handleChange}
             required
           />
           <input
             type="email"
+            name="correo"
             placeholder="Correo electrónico"
-            value={formData.email}
-            onChange={e => setFormData({...formData, email: e.target.value})}
+            value={formData.correo}
+            onChange={handleChange}
             required
           />
           <input
             type="password"
+            name="contraseña"
             placeholder="Contraseña"
             value={formData.contraseña}
-            onChange={e => setFormData({...formData, contraseña: e.target.value})}
+            onChange={handleChange}
             required
           />
+          <select name="rol" value={formData.rol} onChange={handleChange}>
+            <option value="admin">Administrador</option>
+            <option value="profesor">Profesor</option>
+            <option value="estudiante_tutor">Tutor</option>
+            <option value="estudiante_tutoriado">Tutoriado</option>
+          </select>
           <button type="submit">Crear cuenta</button>
         </form>
-
         {error && <p>{error}</p>}
-
         <button
           type="button"
           className="register-btn"
