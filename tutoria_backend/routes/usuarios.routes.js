@@ -4,7 +4,7 @@ const router = express.Router();
 const Usuario = require("../models/Usuario"); // tu modelo de MongoDB
 
 // Ruta para crear un nuevo usuario
-router.post("/usuarios", async (req, res) => {
+router.post("/", async (req, res) => {
   const { correo, contraseña, rol } = req.body;
 
   // Validación básica

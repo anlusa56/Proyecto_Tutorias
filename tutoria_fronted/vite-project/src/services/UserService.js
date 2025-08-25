@@ -1,5 +1,5 @@
 // src/services/userService.js
-const API_URL = "http://localhost:3000/api/usuarios"; // cambia según tu backend
+const API_URL = "http://localhost:4000/api/usuarios"; // cambia según tu backend
 
 async function getUsers() {
   const token = localStorage.getItem("token");
@@ -27,7 +27,7 @@ async function deleteUser(id) {
 
 async function createUser(user) {
   const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:3000/api/usuarios", {
+  const res = await fetch("http://localhost:4000/api/usuarios", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,3 +45,6 @@ export default {
   deleteUser,
   createUser,
 };
+
+// Agrega esta línea:
+export { getUsers, deleteUser, createUser };

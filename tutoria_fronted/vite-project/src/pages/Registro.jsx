@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 export default function Registro({ setMostrarRegistro }) {
-  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [formData, setFormData] = useState({ name: "", email: "", conraseña: "" });
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
@@ -52,8 +52,8 @@ export default function Registro({ setMostrarRegistro }) {
           <input
             type="password"
             placeholder="Contraseña"
-            value={formData.password}
-            onChange={e => setFormData({...formData, password: e.target.value})}
+            value={formData.contraseña}
+            onChange={e => setFormData({...formData, contraseña: e.target.value})}
             required
           />
           <button type="submit">Crear cuenta</button>

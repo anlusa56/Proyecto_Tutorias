@@ -4,7 +4,7 @@ import './Login.css';
 
 export default function Login({ setUsuario, setMostrarRegistro }) {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [contraseña, setContraseña] = useState(""); // Cambia 'password' por 'contraseña'
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
@@ -12,10 +12,10 @@ export default function Login({ setUsuario, setMostrarRegistro }) {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:4000/api/usuarios", {
+      const res = await fetch("http://localhost:4000/api/login", { // Usa la ruta /api/login
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, contraseña }), // Usa 'contraseña'
       });
 
       if (!res.ok) {
@@ -25,9 +25,9 @@ export default function Login({ setUsuario, setMostrarRegistro }) {
 
       const data = await res.json();
       localStorage.setItem("token", data.token);
-      localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      localStorage.setItem("usuario", JSON.stringify(data.user));
 
-      setUsuario(data.usuario);
+      setUsuario(data.user);
     } catch (err) {
       setError("Error de conexión con el servidor");
     }
@@ -48,8 +48,8 @@ export default function Login({ setUsuario, setMostrarRegistro }) {
           <input
             type="password"
             placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={contraseña}
+            onChange={(e) => setContraseña(e.target.value)}
             required
           />
           <button type="submit">Entrar</button>

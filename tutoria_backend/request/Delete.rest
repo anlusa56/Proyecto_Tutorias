@@ -1,1 +1,1 @@
-DELETE http://localhost:4000/api/usuarios/687edd6e64f6a71f96120ca9
+DELETE http://localhost:4000/api/usuarios/

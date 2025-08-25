@@ -10,7 +10,7 @@ const {
 } = require("../controllers/usuario.controller");
 
 // Ruta protegida solo para usuarios autenticados
-router.get("/",obtenerUsuarios);
+router.get("/", obtenerUsuarios);
 router.get("/:id", obtenerUsuarioPorId);
 router.post("/", crearUsuario);
 router.put("/:id", actualizarUsuario);

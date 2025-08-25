@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const Usuario = require("./models/Usuario");
@@ -14,28 +15,32 @@ app.use(cors({
 app.use(express.json());
 
 // Rutas (puedes tener otras aparte)
-app.use("/api/usuarios", require("./routes/usuarios.routes"));
+app.use("/api/usuarios", require("./routes/usuario.routes"));
 
 // Login / registro dinámico
 app.post("/api/login", async (req, res) => {
-  let { email, password } = req.body;
+  let { email, contraseña } = req.body;
 
   email = email.trim();
-  password = password.trim();
+  contraseña = contraseña.trim();
 
   try {
-    let usuario = await Usuario.findOne({ email });
+    let usuario = await Usuario.findOne({ correo: email });
 
     if (!usuario) {
-      // Crear usuario si no existe
-      usuario = new Usuario({ email, password, rol: "tutoriado" });
+      // Crear usuario si no existe y hashear la contraseña
+      const hash = await bcrypt.hash(contraseña, 10);
+      usuario = new Usuario({ correo: email, contraseña: hash, rol: "tutoriado" });
       await usuario.save();
-    } else if (usuario.password !== password) {
-      // Si existe pero la contraseña no coincide
-      return res.status(401).json({ success: false, message: "credenciales incorrectas" });
+    } else {
+      // Comparar la contraseña enviada con el hash guardado
+      const match = await bcrypt.compare(contraseña, usuario.contraseña);
+      if (!match) {
+        return res.status(401).json({ success: false, message: "credenciales incorrectas" });
+      }
     }
 
-    res.json({ success: true, user: { email: usuario.email, rol: usuario.rol } });
+    res.json({ success: true, user: { correo: usuario.correo, rol: usuario.rol } });
   } catch (err) {
     res.status(500).json({ success: false, message: "Error del servidor" });
   }
