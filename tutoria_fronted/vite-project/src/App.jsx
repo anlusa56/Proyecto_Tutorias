@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Home from "./pages/Home";
 import Login from "./components/Login";
 import Registro from "./pages/Registro";
 import AdminMenu from "./components/AdminMenu";
@@ -8,28 +9,31 @@ import TutoriadoMenu from "./components/TutoriadoMenu";
 
 function App() {
   const [usuario, setUsuario] = useState(null);
-  const [mostrarRegistro, setMostrarRegistro] = useState(false);
+  const [pantalla, setPantalla] = useState("home");
 
   useEffect(() => {
     const userData = localStorage.getItem("usuario");
     if (userData) {
       setUsuario(JSON.parse(userData));
+      setPantalla("menu");
     }
   }, []);
 
+  // Si el usuario NO ha iniciado sesión
   if (!usuario) {
-    return (
-      <div>
-        {mostrarRegistro ? (
-          <Registro setMostrarRegistro={setMostrarRegistro} />
-        ) : (
-          <Login setUsuario={setUsuario} setMostrarRegistro={setMostrarRegistro} />
-        )}
-      </div>
-    );
+    switch (pantalla) {
+      case "home":
+        return <Home setPantalla={setPantalla} />;
+      case "login":
+        return <Login setUsuario={setUsuario} setPantalla={setPantalla} />;
+      case "registro":
+        return <Registro setPantalla={setPantalla} />;
+      default:
+        return <Home setPantalla={setPantalla} />;
+    }
   }
 
-  // Switch único para los roles
+  // Si el usuario YA inició sesión → mostrar menú según rol
   switch (usuario.rol) {
     case "admin":
       return <AdminMenu />;
