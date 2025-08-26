@@ -5,7 +5,7 @@ export default function Home({ setPantalla }) {
       <p>Conéctate con tutores y recibe apoyo académico fácilmente.</p>
 
       <div style={{ marginTop: "30px" }}>
-        <button onClick={() => setPantalla("login")} style={{ marginRight: "10px" }}>
+        <button style={{ marginRight: "10px" }} onClick={() => setPantalla("login")}>
           Iniciar Sesión
         </button>
         <button onClick={() => setPantalla("registro")}>

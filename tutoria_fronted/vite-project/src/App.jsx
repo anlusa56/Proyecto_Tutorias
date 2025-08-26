@@ -44,8 +44,11 @@ function App() {
     case "estudiante_tutoriado":
       return <TutoriadoMenu />;
     default:
-      return <div>Rol no válido</div>;
-  }
+    // Si el rol es inválido, limpiar el usuario y mandar al Home
+    localStorage.removeItem("usuario");
+    setUsuario(null);
+    return <Home setPantalla={setPantalla} />;
+}
 }
 
 export default App;
