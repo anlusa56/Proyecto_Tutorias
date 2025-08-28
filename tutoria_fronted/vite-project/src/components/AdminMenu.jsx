@@ -1,23 +1,32 @@
-// src/components/AdminMenu.jsx
 import { UsersPage } from "../pages/UsersPage";
 
 function AdminMenu() {
   return (
-    <div>
-      <h2>Panel del Administrador</h2>
-      <UsersPage />
-      {/* Ejemplo para cualquier menú */}
-      <button
-        onClick={() => {
-          localStorage.removeItem("usuario");
-          localStorage.removeItem("token");
-          window.location.reload(); // Recarga la app y vuelve al login
-        }}
-      >
-        Cerrar sesión
-      </button>
+    <div className="panel-container">
+      <div className="panel">
+        <h2>Panel del Administrador</h2>
+
+        {/* UsersPage centrado */}
+        <div className="users-page-container">
+          <UsersPage />
+        </div>
+
+        {/* Botón de cerrar sesión */}
+        <div style={{ marginTop: "1.5rem" }}>
+          <button
+            onClick={() => {
+              localStorage.removeItem("usuario");
+              localStorage.removeItem("token");
+              window.location.reload();
+            }}
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default AdminMenu;
+

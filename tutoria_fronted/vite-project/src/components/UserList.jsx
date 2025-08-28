@@ -1,5 +1,5 @@
 import UserService from "../services/UserService";
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 
 export function UserList({ reloadTrigger }) {
   const [users, setUsers] = useState([]);
@@ -14,16 +14,27 @@ export function UserList({ reloadTrigger }) {
   }, [reloadTrigger]);
 
   return (
-    <ul>
-      {users.map((user) => (
-        <li key={user._id}>
-          {user.nombre} - {user.correo} - {user.rol}
-          <button onClick={async () => {
-            await UserService.deleteUser(user._id);
-            loadUsers();
-          }}>Eliminar</button>
-        </li>
-      ))}
-    </ul>
+      <div className="user-list-container">
+        <div className="user-list-box">
+          <ul className="user-list">
+            {users.map((user) => (
+              <li key={user._id} className="user-item">
+                {user.nombre} - {user.correo} - {user.rol}
+                <button
+                  className="delete-btn"
+                  onClick={async () => {
+                    await UserService.deleteUser(user._id);
+                    loadUsers();
+                  }}
+                >
+                  Eliminar
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+        
   );
 }
+
