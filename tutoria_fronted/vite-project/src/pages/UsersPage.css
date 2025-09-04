@@ -2,7 +2,7 @@ body{
   display: flex;
   justify-content: center; /* centra horizontal */
   align-items: center;     /* centra vertical */
-  height: 100vh;
+  height: 150vh;
 }
 /* Centrar todo el contenido en la pantalla */
 .user-list-container {
@@ -15,9 +15,9 @@ body{
 
 /* La caja que contiene la lista */
 .user-list-box {
-  width: 400px;
+  width: 600px;
   background: #2b2b2b;
-  padding: 20px;
+  padding: 30px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }

@@ -1,8 +1,12 @@
 const jwt = require("jsonwebtoken");
 
 const verificarToken = (req, res, next) => {
-  const token = req.header("x-token");
+  let token = req.header("x-token") || req.header("Authorization");
   if (!token) return res.status(401).json({ msg: "No hay token, acceso denegado" });
+
+  if (token.startsWith("Bearer ")) {
+    token = token.slice(7).trim();
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);

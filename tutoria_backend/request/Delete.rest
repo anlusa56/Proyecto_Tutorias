@@ -1,1 +1,3 @@
-DELETE http://localhost:4000/api/usuarios/
+DELETE http://localhost:4000/api/usuarios/68abd0dda83f950285de4da4
+Authorization: Bearer 
+
