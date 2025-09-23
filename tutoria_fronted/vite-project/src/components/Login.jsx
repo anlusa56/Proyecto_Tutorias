@@ -1,34 +1,54 @@
-// src/components/Login.jsx
 import { useState } from "react";
-import './Login.css';
+import "./Login.css";
 
-export default function Login({ setUsuario, setMostrarRegistro }) {
-  const [email, setEmail] = useState("");
-  const [contraseña, setContraseña] = useState(""); // Cambia 'password' por 'contraseña'
+export default function Login({ setUsuario, setPantalla }) {
+  const [formData, setFormData] = useState({
+    correo: "",
+    contraseña: ""
+  });
   const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await fetch("http://localhost:4000/api/login", { // Usa la ruta /api/login
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, contraseña }), // Usa 'contraseña'
+      console.log("Enviando datos:", {
+        correo: formData.correo,
+        // No mostramos la contraseña por seguridad
       });
 
+      const res = await fetch("http://localhost:4000/api/usuarios/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await res.json();
+      console.log("Respuesta:", data);
+
       if (!res.ok) {
-        setError("Credenciales incorrectas");
+        setError(data.msg || "Error al iniciar sesión");
+        if (data.debug) console.log("Debug:", data.debug);
         return;
       }
 
-      const data = await res.json();
       localStorage.setItem("token", data.token);
-      localStorage.setItem("usuario", JSON.stringify(data.user));
+      localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      setUsuario(data.usuario);
+      setPantalla("menu");
 
-      setUsuario(data.user);
     } catch (err) {
+      console.error("Error:", err);
       setError("Error de conexión con el servidor");
     }
   };
@@ -36,36 +56,50 @@ export default function Login({ setUsuario, setMostrarRegistro }) {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h1>Iniciar Sesión</h1>
-        <form className="login-form" onSubmit={handleSubmit}>
+        <h2>Iniciar Sesión</h2>
+        
+        <form onSubmit={handleSubmit} className="login-form">
           <input
             type="email"
+            name="correo"
             placeholder="Correo electrónico"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.correo}
+            onChange={handleChange}
             required
           />
           <input
             type="password"
+            name="contraseña"
             placeholder="Contraseña"
-            value={contraseña}
-            onChange={(e) => setContraseña(e.target.value)}
+            value={formData.contraseña}
+            onChange={handleChange}
             required
           />
-          <button type="submit">Entrar</button>
+          
+          <button type="submit" className="login-button">
+            Ingresar
+          </button>
         </form>
 
-        {/* Botón para mostrar el registro */}
-        <button
-          type="button"
-          className="register-btn"
-          onClick={() => setMostrarRegistro(true)}
-        >
-          Registrarse
-        </button>
+        {error && <p className="error-message">{error}</p>}
 
-        {/* Mensaje de error */}
-        {error && <p style={{ color: "red", marginTop: "0.5rem" }}>{error}</p>}
+        <div className="nav-buttons">
+          <button 
+            type="button" 
+            className="register-btn"
+            onClick={() => setPantalla("registro")}
+          >
+            Crear cuenta nueva
+          </button>
+          
+          <button 
+            type="button" 
+            className="back-btn"
+            onClick={() => setPantalla("home")}
+          >
+            Volver al inicio
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-const Tutoria = require("../models/Tutoria");
+const Tutoria = require("../models/Tutorias");
 const Usuario = require("../models/Usuario");
 
 // Crear tutoría

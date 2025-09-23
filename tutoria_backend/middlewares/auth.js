@@ -1,27 +1,23 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
-const verificarToken = (req, res, next) => {
-  let token = req.header("x-token") || req.header("Authorization");
-  if (!token) return res.status(401).json({ msg: "No hay token, acceso denegado" });
+function verificarToken(req, res, next) {
+  const token = req.headers["authorization"];
+  if (!token) return res.status(403).json({ msg: "Token requerido" });
 
-  if (token.startsWith("Bearer ")) {
-    token = token.slice(7).trim();
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  jwt.verify(token.split(" ")[1], process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(401).json({ msg: "Token inválido" });
     req.usuario = decoded;
     next();
-  } catch (err) {
-    res.status(401).json({ msg: "Token inválido" });
-  }
-};
+  });
+}
 
-const soloAdmin = (req, res, next) => {
-  if (req.usuario.rol !== "admin") {
-    return res.status(403).json({ msg: "Acceso denegado" });
+function soloProfesor(req, res, next) {
+  if (req.usuario.rol !== "profesor") {
+    return res.status(403).json({ msg: "Acceso solo para profesores" });
   }
   next();
-};
+}
 
-module.exports = { verificarToken, soloAdmin };
+module.exports = { verificarToken, soloProfesor };
+

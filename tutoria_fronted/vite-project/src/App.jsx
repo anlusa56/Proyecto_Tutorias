@@ -6,49 +6,65 @@ import AdminMenu from "./components/AdminMenu";
 import ProfesorMenu from "./components/ProfesorMenu";
 import TutorMenu from "./components/TutorMenu";
 import TutoriadoMenu from "./components/TutoriadoMenu";
+import ErrorBoundary from "./components/ErrorBoundary";
+
+const ROLES = {
+  ADMIN: "admin",
+  PROFESOR: "profesor",
+  TUTOR: "estudiante_tutor",
+  TUTORIADO: "estudiante_tutoriado"
+};
 
 function App() {
   const [usuario, setUsuario] = useState(null);
   const [pantalla, setPantalla] = useState("home");
 
+  const cerrarSesion = () => {
+    localStorage.removeItem("usuario");
+    setUsuario(null);
+    setPantalla("home");
+  };
+
+  const handleError = (error) => {
+    console.error('Error en la aplicación:', error);
+    cerrarSesion();
+  };
+
   useEffect(() => {
     const userData = localStorage.getItem("usuario");
     if (userData) {
-      setUsuario(JSON.parse(userData));
-      setPantalla("menu");
+      try {
+        const parsedUser = JSON.parse(userData);
+        if (!parsedUser.rol || !parsedUser.id) {
+          throw new Error("Datos de usuario inválidos");
+        }
+        setUsuario(parsedUser);
+        setPantalla("menu");
+      } catch (error) {
+        console.error("Error al cargar datos del usuario:", error);
+        localStorage.removeItem("usuario");
+      }
     }
   }, []);
 
-  // Si el usuario NO ha iniciado sesión
-  if (!usuario) {
-    switch (pantalla) {
-      case "home":
-        return <Home setPantalla={setPantalla} />;
-      case "login":
-        return <Login setUsuario={setUsuario} setPantalla={setPantalla} />;
-      case "registro":
-        return <Registro setPantalla={setPantalla} />;
-      default:
-        return <Home setPantalla={setPantalla} />;
-    }
-  }
-
-  // Si el usuario YA inició sesión → mostrar menú según rol
-  switch (usuario.rol) {
-    case "admin":
-      return <AdminMenu />;
-    case "profesor":
-      return <ProfesorMenu />;
-    case "estudiante_tutor":
-      return <TutorMenu />;
-    case "estudiante_tutoriado":
-      return <TutoriadoMenu />;
-    default:
-    // Si el rol es inválido, limpiar el usuario y mandar al Home
-    localStorage.removeItem("usuario");
-    setUsuario(null);
-    return <Home setPantalla={setPantalla} />;
-}
+  return (
+    <ErrorBoundary onError={handleError}>
+      {!usuario ? (
+        <>
+          {pantalla === "home" && <Home setPantalla={setPantalla} />}
+          {pantalla === "login" && <Login setUsuario={setUsuario} setPantalla={setPantalla} />}
+          {pantalla === "registro" && <Registro setPantalla={setPantalla} />}
+        </>
+      ) : (
+        <>
+          {usuario.rol === ROLES.ADMIN && <AdminMenu onLogout={cerrarSesion} usuario={usuario} />}
+          {usuario.rol === ROLES.PROFESOR && <ProfesorMenu onLogout={cerrarSesion} usuario={usuario} />}
+          {usuario.rol === ROLES.TUTOR && <TutorMenu onLogout={cerrarSesion} usuario={usuario} />}
+          {usuario.rol === ROLES.TUTORIADO && <TutoriadoMenu onLogout={cerrarSesion} usuario={usuario} />}
+        </>
+      )}
+    </ErrorBoundary>
+  );
 }
 
 export default App;

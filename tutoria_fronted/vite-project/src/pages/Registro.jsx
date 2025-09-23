@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-export default function Registro({ setMostrarRegistro }) {
+export default function Registro({ setPantalla }) {
   const [formData, setFormData] = useState({
     nombre: "",
     correo: "",
     contraseña: "",
-    rol: "tutoriado", // valor por defecto
+    rol: "estudiante_tutoriado"
   });
   const [error, setError] = useState("");
 
@@ -31,7 +31,7 @@ export default function Registro({ setMostrarRegistro }) {
       }
 
       alert("Usuario creado exitosamente!");
-      setMostrarRegistro(false);
+      setPantalla("login");
     } catch (err) {
       setError("Error de conexión con el servidor");
     }
@@ -74,11 +74,13 @@ export default function Registro({ setMostrarRegistro }) {
           </select>
           <button type="submit">Crear cuenta</button>
         </form>
-        {error && <p>{error}</p>}
+        
+        {error && <p className="error-message">{error}</p>}
+        
         <button
           type="button"
-          className="register-btn"
-          onClick={() => setMostrarRegistro(false)}
+          className="back-btn"
+          onClick={() => setPantalla("login")}
         >
           Volver al Login
         </button>

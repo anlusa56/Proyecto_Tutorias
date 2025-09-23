@@ -8,7 +8,11 @@ const obtenerUsuarios = async (req, res) => {
     const usuarios = await Usuario.findAll({ attributes: { exclude: ["contraseña"] } });
     res.json(usuarios);
   } catch (error) {
-    res.status(500).json({ msg: "Error al obtener usuarios" });
+    console.error("Error al obtener usuarios:", error);
+    res.status(500).json({ 
+      msg: "Error al obtener usuarios",
+      error: error.message 
+    });
   }
 };
 
@@ -65,11 +69,38 @@ const eliminarUsuario = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { correo, contraseña } = req.body;
-    const usuario = await Usuario.findOne({ where: { correo } });
-    if (!usuario) return res.status(404).json({ msg: "Usuario no encontrado" });
+    
+    // Debug log
+    console.log('Buscando usuario:', correo);
 
+    const usuario = await Usuario.findOne({ 
+      where: { correo },
+      raw: true // Get plain object
+    });
+
+    // Debug log
+    console.log('Usuario encontrado:', usuario ? 'SI' : 'NO');
+
+    if (!usuario) {
+      return res.status(404).json({ 
+        msg: "Usuario no encontrado",
+        debug: { correo } 
+      });
+    }
+
+    // Debug log
+    console.log('Verificando contraseña');
+    
     const valido = await bcrypt.compare(contraseña, usuario.contraseña);
-    if (!valido) return res.status(401).json({ msg: "Credenciales incorrectas" });
+    
+    // Debug log
+    console.log('Contraseña válida:', valido ? 'SI' : 'NO');
+
+    if (!valido) {
+      return res.status(401).json({ 
+        msg: "Contraseña incorrecta" 
+      });
+    }
 
     const token = jwt.sign(
       { id: usuario.id, rol: usuario.rol },
@@ -77,9 +108,23 @@ const login = async (req, res) => {
       { expiresIn: "4h" }
     );
 
-    res.json({ token, usuario: { correo: usuario.correo, rol: usuario.rol } });
+    res.json({
+      msg: "Login exitoso",
+      token,
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        rol: usuario.rol
+      }
+    });
+
   } catch (error) {
-    res.status(500).json({ msg: "Error en login" });
+    console.error('Error en login:', error);
+    res.status(500).json({ 
+      msg: "Error en el servidor",
+      error: error.message 
+    });
   }
 };
 

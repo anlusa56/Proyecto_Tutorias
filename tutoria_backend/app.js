@@ -1,24 +1,34 @@
 const express = require("express");
 const sequelize = require("./sequelize");
 const cors = require("cors");
-require("dotenv").config();
-
 
 const app = express();
 
 // Middlewares
-app.use(cors({ origin: "http://localhost:5173" }));
+app.use(cors());
 app.use(express.json());
 
-// Rutas
+// Routes
 app.use("/api/usuarios", require("./routes/usuario.routes"));
 app.use("/api/tutorias", require("./routes/tutorias"));
 
 const PORT = process.env.PORT || 4000;
 
-sequelize.sync({ force: false }) // Cambia a true si necesitas reiniciar la base de datos
-  .then(() => {
+const startServer = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Conexión establecida");
+    
+    await sequelize.sync({ force: false });
     console.log("🟢 Base de datos sincronizada");
-    app.listen(PORT, () => console.log(`🚀 Servidor en puerto ${PORT}`));
-  })
-  .catch(err => console.error("🔴 Error al sincronizar la base de datos:", err));
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor en puerto ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    process.exit(1);
+  }
+};
+
+startServer();

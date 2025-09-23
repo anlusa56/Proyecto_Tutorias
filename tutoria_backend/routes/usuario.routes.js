@@ -1,19 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const { verificarToken } = require("../middlewares/auth");
 const {
   obtenerUsuarios,
+  obtenerUsuarioPorId,
   crearUsuario,
   actualizarUsuario,
   eliminarUsuario,
-  obtenerUsuarioPorId,
+  login
 } = require("../controllers/usuario.controller");
 
-// Ruta protegida solo para usuarios autenticados
+// Rutas públicas
+router.post("/login", login);
+router.post("/login", login);
+router.post("/", crearUsuario);
+
+// Rutas que requieren autenticación
 router.get("/", obtenerUsuarios);
 router.get("/:id", obtenerUsuarioPorId);
-router.post("/", crearUsuario);
 router.put("/:id", actualizarUsuario);
-router.delete("/:id", verificarToken, eliminarUsuario);
+router.delete("/:id", eliminarUsuario);
 
 module.exports = router;
