@@ -26,25 +26,36 @@ async function deleteUser(id) {
 }
 
 async function createUser(user) {
-  const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:4000/api/usuarios", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(user),
-  });
-  if (!res.ok) throw new Error("Error al crear usuario");
-  return await res.json();
+  try {
+    console.log('Enviando datos:', user);
+    
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(user),
+    });
+
+    const data = await res.json();
+    console.log('Respuesta del servidor:', data);
+
+    if (!res.ok) {
+      throw new Error(data.msg || "Error al crear usuario");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error detallado:", error);
+    throw error;
+  }
 }
 
-// Agrega esta exportación por defecto:
 export default {
   getUsers,
   deleteUser,
   createUser,
 };
 
-// Agrega esta línea:
 export { getUsers, deleteUser, createUser };

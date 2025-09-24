@@ -18,12 +18,12 @@ export function UserList({ reloadTrigger }) {
         <div className="user-list-box">
           <ul className="user-list">
             {users.map((user) => (
-              <li key={user._id} className="user-item">
+              <li key={user.id} className="user-item">
                 {user.nombre} - {user.correo} - {user.rol}
                 <button
                   className="delete-btn"
                   onClick={async () => {
-                    await UserService.deleteUser(user._id);
+                    await UserService.deleteUser(user.id);
                     loadUsers();
                   }}
                 >

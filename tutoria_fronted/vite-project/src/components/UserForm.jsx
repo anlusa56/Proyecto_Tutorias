@@ -1,34 +1,99 @@
-import { useState } from "react";
-import UserService from "../services/UserService";
+import { useState } from 'react';
 
-export function UserForm({ onUserCreated }) {
-  const [form, setForm] = useState({
-    nombre: "",
-    correo: "",
-    rol: "estudiante"
+export default function UserForm({ onSubmit }) {
+  const [formData, setFormData] = useState({
+    nombre: '',
+    correo: '',
+    contraseña: '',
+    rol: 'estudiante_tutoriado'
   });
-
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await UserService.createUser(form);
-    setForm({ nombre: "", correo: "", rol: "estudiante" });
-    onUserCreated();
+    setError('');
+    
+    try {
+      console.log('Enviando formulario:', formData);
+      await onSubmit(formData);
+      // Limpiar formulario
+      setFormData({
+        nombre: '',
+        correo: '',
+        contraseña: '',
+        rol: 'estudiante_tutoriado'
+      });
+    } catch (err) {
+      setError(err.message);
+      console.error('Error en formulario:', err);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input name="nombre" placeholder="Nombre" value={form.nombre} onChange={handleChange} />
-      <input name="correo" placeholder="Correo" value={form.correo} onChange={handleChange} />
-      <select name="rol" value={form.rol} onChange={handleChange}>
-        <option value="administrador">Administrador</option>
-        <option value="profesor">Profesor</option>
-        <option value="estudiante_tutor">Estudiante Tutor</option>
-        <option value="estudiante_tutoriado">Estudiante Tutoriado</option>
-      </select>
-      <button type="submit">Crear usuario</button>
+    <form onSubmit={handleSubmit} className="user-form">
+      <div className="form-group">
+        <label htmlFor="nombre">Nombre:</label>
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          value={formData.nombre}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="correo">Correo:</label>
+        <input
+          type="email"
+          id="correo"
+          name="correo"
+          value={formData.correo}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="contraseña">Contraseña:</label>
+        <input
+          type="password"
+          id="contraseña"
+          name="contraseña"
+          value={formData.contraseña}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="rol">Rol:</label>
+        <select
+          id="rol"
+          name="rol"
+          value={formData.rol}
+          onChange={handleChange}
+        >
+          <option value="admin">Administrador</option>
+          <option value="profesor">Profesor</option>
+          <option value="estudiante_tutor">Tutor</option>
+          <option value="estudiante_tutoriado">Tutoriado</option>
+        </select>
+      </div>
+
+      {error && <p className="error-message">{error}</p>}
+      
+      <button type="submit" className="submit-button">
+        Crear Usuario
+      </button>
     </form>
   );
 }
