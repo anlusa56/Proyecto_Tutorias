@@ -7,6 +7,7 @@ export default function Login({ setUsuario, setPantalla }) {
     contraseña: ""
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -18,13 +19,11 @@ export default function Login({ setUsuario, setPantalla }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      console.log("Enviando datos:", {
-        correo: formData.correo,
-        // No mostramos la contraseña por seguridad
-      });
-
+      console.log("Intentando login con:", { correo: formData.correo });
+      
       const res = await fetch("http://localhost:4000/api/usuarios/login", {
         method: "POST",
         headers: {
@@ -34,22 +33,25 @@ export default function Login({ setUsuario, setPantalla }) {
       });
 
       const data = await res.json();
-      console.log("Respuesta:", data);
+      console.log("Respuesta del servidor:", data);
 
       if (!res.ok) {
-        setError(data.msg || "Error al iniciar sesión");
-        if (data.debug) console.log("Debug:", data.debug);
-        return;
+        throw new Error(data.msg || "Error en la autenticación");
       }
 
+      // Guardar datos del usuario
       localStorage.setItem("token", data.token);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      
+      // Actualizar estado
       setUsuario(data.usuario);
       setPantalla("menu");
 
     } catch (err) {
-      console.error("Error:", err);
-      setError("Error de conexión con el servidor");
+      console.error("Error de login:", err);
+      setError(err.message || "Error de conexión con el servidor");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,6 +67,7 @@ export default function Login({ setUsuario, setPantalla }) {
             placeholder="Correo electrónico"
             value={formData.correo}
             onChange={handleChange}
+            disabled={loading}
             required
           />
           <input
@@ -73,21 +76,31 @@ export default function Login({ setUsuario, setPantalla }) {
             placeholder="Contraseña"
             value={formData.contraseña}
             onChange={handleChange}
+            disabled={loading}
             required
           />
           
-          <button type="submit" className="login-button">
-            Ingresar
+          <button 
+            type="submit" 
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? "Ingresando..." : "Ingresar"}
           </button>
         </form>
 
-        {error && <p className="error-message">{error}</p>}
+        {error && (
+          <p className="error-message">
+            {error}
+          </p>
+        )}
 
         <div className="nav-buttons">
           <button 
             type="button" 
             className="register-btn"
             onClick={() => setPantalla("registro")}
+            disabled={loading}
           >
             Crear cuenta nueva
           </button>
@@ -96,6 +109,7 @@ export default function Login({ setUsuario, setPantalla }) {
             type="button" 
             className="back-btn"
             onClick={() => setPantalla("home")}
+            disabled={loading}
           >
             Volver al inicio
           </button>

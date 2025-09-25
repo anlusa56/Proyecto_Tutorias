@@ -10,8 +10,7 @@ const {
 } = require("../controllers/usuario.controller");
 
 // Rutas públicas
-router.post("/login", login);
-router.post("/login", login);
+router.post("/login", login); // Solo una ruta de login
 router.post("/", crearUsuario);
 
 // Rutas que requieren autenticación

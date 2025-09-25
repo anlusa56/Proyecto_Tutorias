@@ -70,40 +70,28 @@ const login = async (req, res) => {
   try {
     const { correo, contraseña } = req.body;
     
-    // Debug log
-    console.log('Buscando usuario:', correo);
+    console.log('Intento de login:', correo);
 
     const usuario = await Usuario.findOne({ 
-      where: { correo },
-      raw: true // Get plain object
+      where: { correo } 
     });
 
-    // Debug log
-    console.log('Usuario encontrado:', usuario ? 'SI' : 'NO');
-
     if (!usuario) {
-      return res.status(404).json({ 
-        msg: "Usuario no encontrado",
-        debug: { correo } 
-      });
+      return res.status(404).json({ msg: "Usuario no encontrado" });
     }
 
-    // Debug log
-    console.log('Verificando contraseña');
-    
     const valido = await bcrypt.compare(contraseña, usuario.contraseña);
     
-    // Debug log
-    console.log('Contraseña válida:', valido ? 'SI' : 'NO');
-
     if (!valido) {
-      return res.status(401).json({ 
-        msg: "Contraseña incorrecta" 
-      });
+      return res.status(401).json({ msg: "Contraseña incorrecta" });
     }
 
     const token = jwt.sign(
-      { id: usuario.id, rol: usuario.rol },
+      { 
+        id: usuario.id, 
+        rol: usuario.rol,
+        nombre: usuario.nombre 
+      },
       process.env.JWT_SECRET,
       { expiresIn: "4h" }
     );

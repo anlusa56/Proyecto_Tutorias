@@ -1,10 +1,30 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const tutoriaController = require("../controllers/tutoriaController");
+const tutoriaController = require('../controllers/tutoriaController');
+const { verificarToken } = require('../middlewares/auth');
+const checkRol = require('../middlewares/checkRol');
 
-router.post("/", tutoriaController.crearTutoria);
-router.get("/", tutoriaController.obtenerTutorias);
-router.get("/:id", tutoriaController.obtenerTutoriaPorId);
-router.delete("/:id", tutoriaController.eliminarTutoria);
+// Rutas públicas que requieren autenticación
+router.get('/', verificarToken, tutoriaController.getTutoriasByRol);
+
+// Rutas para profesores y admin
+router.post('/', 
+  verificarToken, 
+  checkRol(['admin', 'profesor']), 
+  tutoriaController.crearTutoria
+);
+
+// Rutas solo para admin
+router.put('/:id', 
+  verificarToken, 
+  checkRol(['admin']), 
+  tutoriaController.actualizarTutoria
+);
+
+router.delete('/:id', 
+  verificarToken, 
+  checkRol(['admin']), 
+  tutoriaController.eliminarTutoria
+);
 
 module.exports = router;

@@ -1,32 +1,28 @@
-import { UsersPage } from "../pages/UsersPage";
+import { useState } from 'react';
+import { Link, Routes, Route } from 'react-router-dom';
+import UsersPage from '../pages/UsersPage';
+import TutoriasPage from '../pages/TutoriasPage';
+import ReportesPage from '../pages/ReportesPage';
+import './AdminMenu.css';
 
-function AdminMenu() {
+export default function AdminMenu({ usuario, onLogout }) {
   return (
-    <div className="panel-container">
-      <div className="panel">
-        <h2>Panel del Administrador</h2>
+    <div className="admin-menu">
+      <nav>
+        <ul>
+          <li><Link to="/usuarios">Gestión de Usuarios</Link></li>
+          <li><Link to="/tutorias">Gestión de Tutorías</Link></li>
+          <li><Link to="/reportes">Reportes</Link></li>
+          <li><button onClick={onLogout}>Cerrar Sesión</button></li>
+        </ul>
+      </nav>
 
-        {/* UsersPage centrado */}
-        <div className="users-page-container">
-          <UsersPage />
-        </div>
-
-        {/* Botón de cerrar sesión */}
-        <div style={{ marginTop: "1.5rem" }}>
-          <button
-            onClick={() => {
-              localStorage.removeItem("usuario");
-              localStorage.removeItem("token");
-              window.location.reload();
-            }}
-          >
-            Cerrar sesión
-          </button>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/usuarios" element={<UsersPage />} />
+        <Route path="/tutorias" element={<TutoriasPage />} />
+        <Route path="/reportes" element={<ReportesPage />} />
+      </Routes>
     </div>
   );
 }
-
-export default AdminMenu;
 

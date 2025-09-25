@@ -1,10 +1,10 @@
 import { useState } from "react";
 import UserForm from "../components/UserForm";
 import { UserList } from "../components/UserList";
-import { createUser } from "../services/UserService";
 import "./UsersPage.css";
 
-export function UsersPage() {
+// Cambiamos a exportación por defecto
+export default function UsersPage() {
   const [reload, setReload] = useState(0);
   const [error, setError] = useState("");
 
