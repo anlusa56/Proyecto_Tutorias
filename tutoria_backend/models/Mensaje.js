@@ -1,55 +1,65 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../sequelize');
-const Usuario = require('./Usuario');
-const Tutoria = require('./Tutoria');
+'use strict';
 
-const Mensaje = sequelize.define('Mensaje', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  contenido: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  emisorId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Usuario,
-      key: 'id'
+module.exports = (sequelize, DataTypes) => {
+  const Mensaje = sequelize.define('Mensaje', {
+    contenido: {
+      type: DataTypes.TEXT,
+      allowNull: false
+    },
+    estado: {
+      type: DataTypes.ENUM('enviado', 'leido'),
+      defaultValue: 'enviado'
+    },
+    emisorId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Usuarios',
+        key: 'id'
+      }
+    },
+    receptorId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Usuarios',
+        key: 'id'
+      }
+    },
+    tutoriaId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'Tutorias',
+        key: 'id'
+      }
     }
-  },
-  receptorId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Usuario,
-      key: 'id'
-    }
-  },
-  tutoriaId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Tutoria,
-      key: 'id'
-    }
-  },
-  leido: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
-  }
-}, {
-  tableName: 'mensajes',
-  timestamps: true,
-  underscored: true
-});
+  }, {
+    tableName: 'mensajes',
+    timestamps: true,
+    underscored: true
+  });
 
-// Relaciones
-Mensaje.belongsTo(Usuario, { as: 'emisor', foreignKey: 'emisorId' });
-Mensaje.belongsTo(Usuario, { as: 'receptor', foreignKey: 'receptorId' });
-Mensaje.belongsTo(Tutoria, { as: 'tutoria', foreignKey: 'tutoriaId' });
+  Mensaje.associate = function(models) {
+    // Corregimos las asociaciones asegurándonos de que los modelos existan
+    if (models.Usuario) {
+      Mensaje.belongsTo(models.Usuario, {
+        as: 'emisor',
+        foreignKey: 'emisorId'
+      });
+      
+      Mensaje.belongsTo(models.Usuario, {
+        as: 'receptor',
+        foreignKey: 'receptorId'
+      });
+    }
 
-module.exports = Mensaje;
+    if (models.Tutoria) {
+      Mensaje.belongsTo(models.Tutoria, {
+        foreignKey: 'tutoriaId'
+      });
+    }
+  };
+
+  return Mensaje;
+};

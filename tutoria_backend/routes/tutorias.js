@@ -13,6 +13,12 @@ router.post('/',
   checkRol(['admin', 'profesor']), 
   tutoriaController.crearTutoria
 );
+ayud
+router.post('/asignar',
+  verificarToken,
+  checkRol(['admin', 'profesor']),
+  tutoriaController.asignarTutor
+);
 
 // Rutas solo para admin
 router.put('/:id', 
