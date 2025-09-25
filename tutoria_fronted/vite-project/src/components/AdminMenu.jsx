@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, Routes, Route } from 'react-router-dom';
+import { Link, Routes, Route, Navigate } from 'react-router-dom';
 import UsersPage from '../pages/UsersPage';
 import TutoriasPage from '../pages/TutoriasPage';
 import ReportesPage from '../pages/ReportesPage';
@@ -10,18 +10,21 @@ export default function AdminMenu({ usuario, onLogout }) {
     <div className="admin-menu">
       <nav>
         <ul>
-          <li><Link to="/usuarios">Gestión de Usuarios</Link></li>
-          <li><Link to="/tutorias">Gestión de Tutorías</Link></li>
-          <li><Link to="/reportes">Reportes</Link></li>
+          <li><Link to="/admin/usuarios">Gestión de Usuarios</Link></li>
+          <li><Link to="/admin/tutorias">Gestión de Tutorías</Link></li>
+          <li><Link to="/admin/reportes">Reportes</Link></li>
           <li><button onClick={onLogout}>Cerrar Sesión</button></li>
         </ul>
       </nav>
 
-      <Routes>
-        <Route path="/usuarios" element={<UsersPage />} />
-        <Route path="/tutorias" element={<TutoriasPage />} />
-        <Route path="/reportes" element={<ReportesPage />} />
-      </Routes>
+      <div className="menu-content">
+        <Routes>
+          <Route path="usuarios" element={<UsersPage usuario={usuario} />} />
+          <Route path="tutorias" element={<TutoriasPage usuario={usuario} />} />
+          <Route path="reportes" element={<ReportesPage />} />
+          <Route path="*" element={<Navigate to="usuarios" />} />
+        </Routes>
+      </div>
     </div>
   );
 }

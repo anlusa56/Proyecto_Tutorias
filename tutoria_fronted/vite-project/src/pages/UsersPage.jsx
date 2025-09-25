@@ -1,9 +1,9 @@
 import { useState } from "react";
 import UserForm from "../components/UserForm";
 import { UserList } from "../components/UserList";
+import { createUser } from "../services/UserService";
 import "./UsersPage.css";
 
-// Cambiamos a exportación por defecto
 export default function UsersPage() {
   const [reload, setReload] = useState(0);
   const [error, setError] = useState("");
@@ -11,7 +11,7 @@ export default function UsersPage() {
   const handleUserCreated = async (userData) => {
     try {
       await createUser(userData);
-      setReload(reload + 1);
+      setReload(prev => prev + 1);
       setError("");
     } catch (err) {
       console.error("Error al crear usuario:", err);
