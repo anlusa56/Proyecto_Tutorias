@@ -1,13 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
-export default function Login({ setUsuario, setPantalla }) {
+export default function Login({ setUsuario }) {
   const [formData, setFormData] = useState({
     correo: "",
     contraseña: ""
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -36,19 +38,19 @@ export default function Login({ setUsuario, setPantalla }) {
       console.log("Respuesta del servidor:", data);
 
       if (!res.ok) {
-        throw new Error(data.msg || "Error en la autenticación");
+        throw new Error(data.mensaje || "Error en la autenticación");
       }
 
       // Guardar datos del usuario
       localStorage.setItem("token", data.token);
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
       
-      // Actualizar estado
+      // Actualizar estado y redirigir
       setUsuario(data.usuario);
-      setPantalla("menu");
+      navigate(`/${data.usuario.rol}`);
 
     } catch (err) {
-      console.error("Error de login:", err);
+      console.error("Error detallado:", err);
       setError(err.message || "Error de conexión con el servidor");
     } finally {
       setLoading(false);
@@ -99,7 +101,7 @@ export default function Login({ setUsuario, setPantalla }) {
           <button 
             type="button" 
             className="register-btn"
-            onClick={() => setPantalla("registro")}
+            onClick={() => navigate("/registro")}
             disabled={loading}
           >
             Crear cuenta nueva
@@ -108,7 +110,7 @@ export default function Login({ setUsuario, setPantalla }) {
           <button 
             type="button" 
             className="back-btn"
-            onClick={() => setPantalla("home")}
+            onClick={() => navigate("/")}
             disabled={loading}
           >
             Volver al inicio

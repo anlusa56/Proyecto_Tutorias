@@ -13,7 +13,7 @@ router.post('/',
   checkRol(['admin', 'profesor']), 
   tutoriaController.crearTutoria
 );
-ayud
+
 router.post('/asignar',
   verificarToken,
   checkRol(['admin', 'profesor']),

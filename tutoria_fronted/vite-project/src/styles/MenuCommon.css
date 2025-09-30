@@ -20,6 +20,10 @@
   align-items: center;
 }
 
+.menu-nav li:last-child {
+  margin-left: auto;
+}
+
 .menu-nav a {
   text-decoration: none;
   color: #333;
@@ -31,29 +35,64 @@
 
 .menu-nav a:hover {
   background-color: #f0f0f0;
-  color: #2196F3;
 }
 
-.menu-nav button {
+.logout-button {
   background-color: #dc3545;
   color: white;
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.menu-nav button:hover {
-  background-color: #c82333;
 }
 
 .menu-content {
   flex: 1;
   padding: 20px;
+  margin: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  /* Asegurar que el contenido sea visible */
+  position: relative;
+  z-index: 1;
+  overflow: visible;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+}
+
+.section-container {
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  /* Asegurar visibilidad */
+  position: relative;
+  z-index: 2;
+}
+
+.error-message {
+  color: #dc3545;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f8d7da;
+  margin: 10px 0;
+}
+
+.tutorias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.tutoria-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 @media (max-width: 768px) {

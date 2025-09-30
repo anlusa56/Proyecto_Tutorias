@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useState, useCallback } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./components/Login";
 import Registro from "./pages/Registro";
@@ -7,7 +7,9 @@ import AdminMenu from "./components/AdminMenu";
 import ProfesorMenu from "./components/ProfesorMenu";
 import TutorMenu from "./components/TutorMenu";
 import TutoriadoMenu from "./components/TutoriadoMenu";
+import './App.css';
 
+// Constantes de roles
 const ROLES = {
   ADMIN: "admin",
   PROFESOR: "profesor",
@@ -15,61 +17,103 @@ const ROLES = {
   TUTORIADO: "estudiante_tutoriado"
 };
 
-const getRutaBase = (rol) => {
-  switch (rol) {
-    case ROLES.ADMIN: return '/admin';
-    case ROLES.PROFESOR: return '/profesor';
-    case ROLES.TUTOR: return '/tutor';
-    case ROLES.TUTORIADO: return '/tutoriado';
-    default: return '/';
+function AppRoutes({ usuario, setUsuario }) {
+  const handleLogout = useCallback(() => {
+    // Limpiar localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    // Actualizar estado
+    setUsuario(null);
+    // Redirigir a home
+    window.location.href = '/';
+  }, [setUsuario]);
+
+  // Si no hay usuario, mostrar rutas públicas
+  if (!usuario) {
+    return (
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login setUsuario={setUsuario} />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    );
   }
-};
+
+  // Si hay usuario, mostrar rutas según rol
+  return (
+    <Routes>
+      {/* Ruta raíz redirige según rol */}
+      <Route path="/" element={<Navigate to={`/${usuario.rol}`} replace />} />
+
+      {/* Rutas de Admin */}
+      <Route path="/admin/*" element={
+        usuario.rol === ROLES.ADMIN ? (
+          <AdminMenu usuario={usuario} onLogout={handleLogout} />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      } />
+
+      {/* Rutas de Profesor */}
+      <Route path="/profesor/*" element={
+        usuario.rol === ROLES.PROFESOR ? (
+          <ProfesorMenu usuario={usuario} onLogout={handleLogout} />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      } />
+
+      {/* Rutas de Tutor */}
+      <Route path="/estudiante_tutor/*" element={
+        usuario.rol === ROLES.TUTOR ? (
+          <TutorMenu usuario={usuario} onLogout={handleLogout} />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      } />
+
+      {/* Rutas de Tutoriado */}
+      <Route path="/estudiante_tutoriado/*" element={
+        usuario.rol === ROLES.TUTORIADO ? (
+          <TutoriadoMenu usuario={usuario} onLogout={handleLogout} />
+        ) : (
+          <Navigate to="/" replace />
+        )
+      } />
+
+      {/* Ruta fallback */}
+      <Route path="*" element={<Navigate to={`/${usuario.rol}`} replace />} />
+    </Routes>
+  );
+}
 
 function App() {
-  const [usuario, setUsuario] = useState(null);
-  const [pantalla, setPantalla] = useState("home");
+  // Estado del usuario con inicialización desde localStorage
+  const [usuario, setUsuario] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('usuario');
+      const token = localStorage.getItem('token');
+      
+      if (!savedUser || !token) {
+        return null;
+      }
+      
+      return JSON.parse(savedUser);
+    } catch (error) {
+      console.error('Error parsing user:', error);
+      localStorage.clear();
+      return null;
+    }
+  });
 
+  // Renderizado principal
   return (
-    <Router>
-      <div className="app">
-        <Routes>
-          {/* Rutas públicas */}
-          <Route path="/" element={
-            !usuario ? <Home setPantalla={setPantalla} /> : 
-            <Navigate to={getRutaBase(usuario.rol)} replace />
-          } />
-          <Route path="/login" element={
-            !usuario ? <Login setUsuario={setUsuario} setPantalla={setPantalla} /> :
-            <Navigate to={getRutaBase(usuario.rol)} replace />
-          } />
-
-          {/* Rutas protegidas */}
-          <Route path="/admin/*" element={
-            usuario?.rol === ROLES.ADMIN ? 
-              <AdminMenu usuario={usuario} onLogout={() => setUsuario(null)} /> :
-              <Navigate to="/login" replace />
-          } />
-          <Route path="/profesor/*" element={
-            usuario?.rol === ROLES.PROFESOR ? 
-              <ProfesorMenu usuario={usuario} onLogout={() => setUsuario(null)} /> :
-              <Navigate to="/login" replace />
-          } />
-          <Route path="/tutor/*" element={
-            usuario?.rol === ROLES.TUTOR ? 
-              <TutorMenu usuario={usuario} onLogout={() => setUsuario(null)} /> :
-              <Navigate to="/login" replace />
-          } />
-          <Route path="/tutoriado/*" element={
-            usuario?.rol === ROLES.TUTORIADO ? 
-              <TutoriadoMenu usuario={usuario} onLogout={() => setUsuario(null)} /> :
-              <Navigate to="/login" replace />
-          } />
-          
-          {/* Ruta por defecto */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+    <BrowserRouter>
+      <div className="app-container">
+        <AppRoutes usuario={usuario} setUsuario={setUsuario} />
       </div>
-    </Router>
+    </BrowserRouter>
   );
 }
 

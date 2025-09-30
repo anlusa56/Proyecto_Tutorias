@@ -1,12 +1,11 @@
+require('./.env.config');
 const express = require("express");
 const sequelize = require("./sequelize");
 const cors = require("cors");
 require("dotenv").config();
 
 // Importar modelos
-require("./models/Usuario");
-require("./models/Tutoria");
-require("./models/Mensaje");
+const db = require('./models');
 
 const app = express();
 
@@ -26,8 +25,7 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log("✅ Conexión establecida");
     
-    // Sincronizar modelos con la base de datos
-    await sequelize.sync({ force: false });
+    await sequelize.sync({ force: false }); // Cambiar a false después de la sincronización
     console.log("🟢 Base de datos sincronizada");
     
     app.listen(PORT, () => {

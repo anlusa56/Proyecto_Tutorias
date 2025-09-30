@@ -30,17 +30,45 @@ const obtenerUsuarioPorId = async (req, res) => {
 // Crear usuario
 const crearUsuario = async (req, res) => {
   try {
-    const { nombre, correo, contraseña, rol } = req.body;
+    const { nombre, correo, password, rol } = req.body;
+    console.log("Datos recibidos:", { nombre, correo, rol });
 
-    const existe = await Usuario.findOne({ where: { correo } });
-    if (existe) return res.status(400).json({ msg: "Correo ya registrado" });
+    const usuarioExistente = await Usuario.findOne({ 
+      where: { correo } 
+    });
 
-    const hash = await bcrypt.hash(contraseña, 10);
-    const nuevoUsuario = await Usuario.create({ nombre, correo, contraseña: hash, rol });
+    if (usuarioExistente) {
+      return res.status(400).json({ 
+        msg: "El correo ya está registrado" 
+      });
+    }
 
-    res.status(201).json(nuevoUsuario);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const nuevoUsuario = await Usuario.create({
+      nombre,
+      correo,
+      contraseña: hashedPassword, // Cambiado a contraseña
+      rol
+    });
+
+    res.status(201).json({
+      msg: "Usuario creado exitosamente",
+      usuario: {
+        id: nuevoUsuario.id,
+        nombre: nuevoUsuario.nombre,
+        correo: nuevoUsuario.correo,
+        rol: nuevoUsuario.rol
+      }
+    });
+
   } catch (error) {
-    res.status(500).json({ msg: "Error al crear usuario" });
+    console.error("Error al crear usuario:", error);
+    res.status(500).json({
+      msg: "Error al crear usuario",
+      error: error.message
+    });
   }
 };
 

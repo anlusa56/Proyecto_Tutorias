@@ -9,11 +9,16 @@
   padding: 0;
   margin: 0;
   display: flex;
-  gap: 20px;
+  gap: 1rem;
+  align-items: center;
   background: #fff;
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-menu nav ul li:last-child {
+  margin-left: auto;
 }
 
 .admin-menu nav a {
@@ -39,5 +44,19 @@
 }
 
 .admin-menu button:hover {
+  background-color: #c82333;
+}
+
+.logout-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
   background-color: #c82333;
 }

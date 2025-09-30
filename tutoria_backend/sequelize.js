@@ -1,13 +1,12 @@
 const { Sequelize } = require("sequelize");
 const dotenv = require("dotenv");
 
-// Configure dotenv silently
-process.env.SUPPRESS_DOTENV_TIPS = "true";
+// Configuración silenciosa de dotenv
 dotenv.config({
   silent: true,
-  debug: false,
   override: true,
-  quiet: true
+  debug: false,
+  path: '.env'
 });
 
 const sequelize = new Sequelize({

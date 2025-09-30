@@ -1,13 +1,17 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./Registro.css";
 
-export default function Registro({ setPantalla }) {
+export default function Registro() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nombre: "",
     correo: "",
     contraseña: "",
-    rol: "estudiante_tutoriado"
+    rol: "estudiante_tutoriado" // Valor por defecto válido
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -16,29 +20,43 @@ export default function Registro({ setPantalla }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
+      console.log("Enviando datos:", formData);
+
       const res = await fetch("http://localhost:4000/api/usuarios", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          nombre: formData.nombre,
+          correo: formData.correo,
+          password: formData.contraseña, // Cambiado a password para coincidir con el backend
+          rol: formData.rol
+        })
       });
 
+      const data = await res.json();
+      console.log("Respuesta completa del servidor:", data);
+
       if (!res.ok) {
-        const errorData = await res.json();
-        setError(errorData.message || "No se pudo crear el usuario");
-        return;
+        throw new Error(data.error || data.msg || "Error al crear usuario");
       }
 
       alert("Usuario creado exitosamente!");
-      setPantalla("login");
+      navigate("/login");
     } catch (err) {
-      setError("Error de conexión con el servidor");
+      console.error("Error detallado:", err);
+      setError(err.message || "Error de conexión con el servidor");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
+    <div className="registro-container">
       <div className="login-card">
         <h1>Registrarse</h1>
         <form className="login-form" onSubmit={handleSubmit}>
@@ -66,24 +84,39 @@ export default function Registro({ setPantalla }) {
             onChange={handleChange}
             required
           />
-          <select name="rol" value={formData.rol} onChange={handleChange}>
-            <option value="admin">Administrador</option>
+          <select 
+            name="rol" 
+            value={formData.rol} 
+            onChange={handleChange}
+            required
+          >
+            <option value="estudiante_tutoriado">Estudiante (Tutoriado)</option>
+            <option value="estudiante_tutor">Estudiante (Tutor)</option>
             <option value="profesor">Profesor</option>
-            <option value="estudiante_tutor">Tutor</option>
-            <option value="estudiante_tutoriado">Tutoriado</option>
+            <option value="admin">Administrador</option>
           </select>
-          <button type="submit">Crear cuenta</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Creando usuario..." : "Crear cuenta"}
+          </button>
         </form>
         
         {error && <p className="error-message">{error}</p>}
         
-        <button
-          type="button"
-          className="back-btn"
-          onClick={() => setPantalla("login")}
-        >
-          Volver al Login
-        </button>
+        <div className="nav-buttons">
+          <button 
+            type="button" 
+            onClick={() => navigate("/login")}
+          >
+            Ya tengo cuenta
+          </button>
+          
+          <button 
+            type="button" 
+            onClick={() => navigate("/")}
+          >
+            Volver al inicio
+          </button>
+        </div>
       </div>
     </div>
   );

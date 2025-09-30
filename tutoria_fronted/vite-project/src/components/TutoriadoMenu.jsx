@@ -1,113 +1,121 @@
-import { useState, useEffect } from "react";
-import { Link, Routes, Route } from "react-router-dom";
+import { useState } from "react";
+import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import '../styles/MenuCommon.css';
 
-export default function TutoriadoMenu({ usuario, onLogout }) {
+// Componentes internos
+function MisTutorias({ usuario }) {
   const [tutorias, setTutorias] = useState([]);
-  const [tutor, setTutor] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const cargarDatos = async () => {
+    const fetchTutorias = async () => {
       try {
-        // Cargar tutorías
-        const resTutorias = await fetch(`http://localhost:4000/api/tutorias?estudianteId=${usuario.id}`, {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`http://localhost:4000/api/tutorias`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${token}`
           }
         });
-        
-        const dataTutorias = await resTutorias.json();
-        if (!resTutorias.ok) throw new Error(dataTutorias.msg);
-        setTutorias(dataTutorias);
-
-        // Cargar información del tutor
-        const resTutor = await fetch(`http://localhost:4000/api/tutores/asignado/${usuario.id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        const dataTutor = await resTutor.json();
-        if (!resTutor.ok) throw new Error(dataTutor.msg);
-        setTutor(dataTutor);
-
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        setTutorias(data);
       } catch (err) {
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    cargarDatos();
-  }, [usuario.id]);
+    fetchTutorias();
+  }, []);
+
+  if (loading) return <div>Cargando...</div>;
+
+  return (
+    <div className="section-container">
+      <h2>Mis Tutorías</h2>
+      {error ? (
+        <div className="error-message">{error}</div>
+      ) : (
+        <div className="tutorias-grid">
+          {tutorias.length === 0 ? (
+            <p>No tienes tutorías programadas</p>
+          ) : (
+            tutorias.map(tutoria => (
+              <div key={tutoria.id} className="tutoria-card">
+                <h3>{tutoria.materia}</h3>
+                <p>Fecha: {new Date(tutoria.fecha).toLocaleDateString()}</p>
+                <p>Estado: {tutoria.estado}</p>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MiTutor() {
+  return (
+    <div className="section-container">
+      <h2>Mi Tutor</h2>
+      <p>Información del tutor asignado</p>
+    </div>
+  );
+}
+
+function Calendario() {
+  return (
+    <div className="section-container">
+      <h2>Calendario</h2>
+      <p>Calendario de tutorías programadas</p>
+    </div>
+  );
+}
+
+function Materiales() {
+  return (
+    <div className="section-container">
+      <h2>Materiales</h2>
+      <p>Materiales de estudio compartidos</p>
+    </div>
+  );
+}
+
+// Componente principal
+export default function TutoriadoMenu({ usuario, onLogout }) {
+  const navigate = useNavigate();
+
+  if (!usuario) {
+    return <Navigate to="/login" />;
+  }
 
   return (
     <div className="menu-container">
       <nav className="menu-nav">
         <ul>
-          <li><Link to="/tutoriado/tutorias">Mis Tutorías</Link></li>
-          <li><Link to="/tutoriado/tutor">Mi Tutor</Link></li>
-          <li><Link to="/tutoriado/calendario">Calendario</Link></li>
-          <li><Link to="/tutoriado/materiales">Materiales</Link></li>
-          <li><button onClick={onLogout}>Cerrar Sesión</button></li>
+          <li><Link to="tutorias">Mis Tutorías</Link></li>
+          <li><Link to="tutor">Mi Tutor</Link></li>
+          <li><Link to="calendario">Calendario</Link></li>
+          <li><Link to="materiales">Materiales</Link></li>
+          <li>
+            <button onClick={onLogout} className="logout-button">
+              Cerrar Sesión
+            </button>
+          </li>
         </ul>
       </nav>
 
       <div className="menu-content">
         <Routes>
-          <Route path="/tutoriado/tutorias" element={<MisTutorias tutorias={tutorias} error={error} />} />
-          <Route path="/tutoriado/tutor" element={<MiTutor tutor={tutor} error={error} />} />
-          <Route path="/tutoriado/calendario" element={<Calendario tutorias={tutorias} />} />
-          <Route path="/tutoriado/materiales" element={<Materiales />} />
+          <Route index element={<Navigate to="tutorias" />} />
+          <Route path="tutorias" element={<MisTutorias usuario={usuario} />} />
+          <Route path="tutor" element={<MiTutor />} />
+          <Route path="calendario" element={<Calendario />} />
+          <Route path="materiales" element={<Materiales />} />
         </Routes>
       </div>
     </div>
   );
-}
-
-function MisTutorias({ tutorias, error }) {
-  return (
-    <div className="tutorias-list">
-      <h3>Mis Tutorías</h3>
-      {error && <p className="error-message">{error}</p>}
-      
-      {tutorias && tutorias.length > 0 ? (
-        <ul>
-          {tutorias.map(tutoria => (
-            <li key={tutoria.id}>
-              <p>Materia: {tutoria.materia}</p>
-              <p>Fecha: {new Date(tutoria.fecha).toLocaleString()}</p>
-              <p>Tutor: {tutoria.Tutor?.nombre}</p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No tienes tutorías programadas</p>
-      )}
-    </div>
-  );
-}
-
-function MiTutor({ tutor, error }) {
-  return (
-    <div className="mi-tutor">
-      <h3>Mi Tutor</h3>
-      {error && <p className="error-message">{error}</p>}
-      {tutor ? (
-        <div>
-          <p>Nombre: {tutor.nombre}</p>
-          <p>Email: {tutor.email}</p>
-        </div>
-      ) : (
-        <p>No tienes un tutor asignado</p>
-      )}
-    </div>
-  );
-}
-
-function Calendario({ tutorias }) {
-  return <div>Calendario</div>;
-}
-
-function Materiales() {
-  return <div>Materiales</div>;
 }
