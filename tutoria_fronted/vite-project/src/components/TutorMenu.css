@@ -1,0 +1,108 @@
+.avances-form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.retroalimentaciones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.retroalimentacion-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.retroalimentacion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.retroalimentacion-header h3 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.fecha {
+  color: #666;
+  font-size: 14px;
+}
+
+.profesor-nombre {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.retroalimentacion-content {
+  margin: 16px 0;
+  line-height: 1.6;
+}
+
+.calificacion {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.calificacion strong {
+  color: #2196f3;
+  font-size: 18px;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .retroalimentaciones-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .avances-form {
+    padding: 15px;
+  }
+}

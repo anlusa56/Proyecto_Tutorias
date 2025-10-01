@@ -48,7 +48,7 @@ function AppRoutes({ usuario, setUsuario }) {
 
       {/* Rutas de Admin */}
       <Route path="/admin/*" element={
-        usuario?.rol === ROLES.ADMIN ? (
+        usuario.rol === ROLES.ADMIN ? (
           <AdminMenu usuario={usuario} onLogout={handleLogout} />
         ) : (
           <Navigate to="/" replace />
