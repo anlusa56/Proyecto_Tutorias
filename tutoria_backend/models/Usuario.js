@@ -1,42 +1,54 @@
 'use strict';
 
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../sequelize');
+const { Model } = require('sequelize');
 
-class Usuario extends Model {}
+module.exports = (sequelize, DataTypes) => {
+  class Usuario extends Model {
+    static associate(models) {
+      Usuario.belongsToMany(models.Tutoria, {
+        through: 'tutores_tutorias',
+        as: 'tutoriasComoTutor',
+        foreignKey: 'usuario_id'
+      });
 
-Usuario.init({
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  nombre: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  correo: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true
-  },
-  contraseña: {  // Cambiado de password a contraseña
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  rol: {
-    type: DataTypes.ENUM('admin', 'profesor', 'estudiante_tutor', 'estudiante_tutoriado'),
-    allowNull: false,
-    validate: {
-      isIn: [['admin', 'profesor', 'estudiante_tutor', 'estudiante_tutoriado']]
+      Usuario.belongsToMany(models.Tutoria, {
+        through: 'tutoriados_tutorias',
+        as: 'tutoriasComoTutoriado',
+        foreignKey: 'usuario_id'
+      });
+
+      Usuario.hasMany(models.Tutoria, {
+        as: 'tutoriasComoProfesor',
+        foreignKey: 'profesor_id'
+      });
     }
   }
-}, {
-  sequelize,
-  modelName: 'Usuario',
-  tableName: 'usuarios',
-  timestamps: true,
-  underscored: true
-});
 
-module.exports = Usuario;
+  Usuario.init({
+    nombre: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    correo: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+    },
+    contraseña: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    rol: {
+      type: DataTypes.ENUM('admin', 'profesor', 'estudiante_tutor', 'estudiante_tutoriado'),
+      allowNull: false
+    }
+  }, {
+    sequelize,
+    modelName: 'Usuario',
+    tableName: 'usuarios',
+    timestamps: true,
+    underscored: true
+  });
+
+  return Usuario;
+};

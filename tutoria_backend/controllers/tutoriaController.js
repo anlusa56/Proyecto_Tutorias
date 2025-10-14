@@ -1,22 +1,78 @@
-const { Tutoria, Usuario } = require('../models');
+const db = require('../models');
+const { Usuario, Tutoria } = db;
+
+const crearTutoria = async (req, res) => {
+  try {
+    const { tutorId, tutoriadoId, materia, fecha, horaInicio, horaFin, observaciones } = req.body;
+    const profesorId = req.usuario.id;
+
+    console.log('Datos recibidos:', {
+      tutorId, tutoriadoId, materia, fecha, horaInicio, horaFin, observaciones, profesorId
+    });
+
+    // Crear la tutoría
+    const tutoria = await Tutoria.create({
+      titulo: `Tutoría de ${materia}`,
+      materia,
+      fecha,
+      hora_inicio: horaInicio,
+      hora_fin: horaFin,
+      observaciones,
+      profesor_id: profesorId,
+      estado: 'programada'
+    });
+
+    // Agregar las relaciones
+    await Promise.all([
+      tutoria.addTutores([tutorId]),
+      tutoria.addTutoriados([tutoriadoId])
+    ]);
+
+    // Obtener la tutoría con sus relaciones
+    const tutoriaCompleta = await Tutoria.findByPk(tutoria.id, {
+      include: [
+        { model: Usuario, as: 'profesor' },
+        { model: Usuario, as: 'tutores' },
+        { model: Usuario, as: 'tutoriados' }
+      ]
+    });
+
+    res.status(201).json({
+      msg: "Tutoría creada exitosamente",
+      tutoria: tutoriaCompleta
+    });
+
+  } catch (error) {
+    console.error('Error al crear tutoría:', error);
+    res.status(500).json({
+      msg: "Error al crear tutoría",
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+};
 
 const tutoriaController = {
   // Obtener todas las tutorías según el rol
   getTutoriasByRol: async (req, res) => {
     try {
-      const { rol, id } = req.usuario;
-      let tutorias;
+      console.log('Usuario solicitando tutorías:', req.usuario); // Debug
+      const { id, rol } = req.usuario;
 
+      let tutorias;
       switch (rol) {
+        case 'profesor':
+          tutorias = await Tutoria.findAll({
+            where: { profesor_id: id },
+            include: [
+              { model: Usuario, as: 'tutores' },
+              { model: Usuario, as: 'tutoriados' }
+            ]
+          });
+          break;
         case 'admin':
           tutorias = await Tutoria.findAll({
             include: ['profesor', 'tutores', 'tutoriados']
-          });
-          break;
-        case 'profesor':
-          tutorias = await Tutoria.findAll({
-            where: { profesorId: id },
-            include: ['tutores', 'tutoriados']
           });
           break;
         case 'estudiante_tutor':
@@ -43,52 +99,16 @@ const tutoriaController = {
 
       res.json(tutorias);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ msg: 'Error al obtener tutorías', error });
+      console.error('Error en getTutoriasByRol:', error);
+      res.status(500).json({
+        msg: "Error al obtener tutorías",
+        error: error.message
+      });
     }
   },
 
   // Crear una nueva tutoría
-  crearTutoria: async (req, res) => {
-    try {
-      const { titulo, materia, fecha, horaInicio, horaFin, costoPorHora, tutorId, tutoriadoId } = req.body;
-      const profesorId = req.usuario.id;
-
-      const tutoria = await Tutoria.create({
-        titulo,
-        materia,
-        fecha,
-        horaInicio,
-        horaFin,
-        costoPorHora,
-        profesorId,
-        estado: 'programada'
-      });
-
-      if (tutorId) {
-        const tutor = await Usuario.findOne({
-          where: { id: tutorId, rol: 'estudiante_tutor' }
-        });
-        if (tutor) await tutoria.addTutor(tutor);
-      }
-
-      if (tutoriadoId) {
-        const tutoriado = await Usuario.findOne({
-          where: { id: tutoriadoId, rol: 'estudiante_tutoriado' }
-        });
-        if (tutoriado) await tutoria.addTutoriado(tutoriado);
-      }
-
-      const tutoriaCompleta = await Tutoria.findByPk(tutoria.id, {
-        include: ['profesor', 'tutores', 'tutoriados']
-      });
-
-      res.status(201).json(tutoriaCompleta);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ msg: 'Error al crear tutoría', error });
-    }
-  },
+  crearTutoria,
 
   // Obtener todas las tutorías
   obtenerTutorias: async (req, res) => {
@@ -202,50 +222,47 @@ const tutoriaController = {
   // Asignar tutor
   asignarTutor: async (req, res) => {
     try {
-      const { tutorId, tutoriadoId, materia, costoPorHora } = req.body;
+      const { tutorId, tutoriadoId, materia } = req.body;
       const profesorId = req.usuario.id;
 
-      // Validaciones
-      if (!tutorId || !tutoriadoId || !materia || !costoPorHora) {
-        return res.status(400).json({
-          msg: "Faltan campos requeridos"
-        });
-      }
-
-      // Verificar que el tutor y tutoriado existan y tengan los roles correctos
+      // Validar que el tutor sea efectivamente un tutor
       const tutor = await Usuario.findOne({
-        where: { id: tutorId, rol: 'estudiante_tutor' }
-      });
-      
-      const tutoriado = await Usuario.findOne({
-        where: { id: tutoriadoId, rol: 'estudiante_tutoriado' }
+        where: { 
+          id: tutorId,
+          rol: 'estudiante_tutor'
+        }
       });
 
-      if (!tutor || !tutoriado) {
-        return res.status(404).json({
-          msg: "Tutor o tutoriado no encontrado"
-        });
+      if (!tutor) {
+        return res.status(400).json({ msg: "El usuario seleccionado no es un tutor válido" });
       }
 
-      // Crear la tutoría
+      // Validar que el tutoriado no tenga ya un tutor asignado
+      const tutoriado = await Usuario.findOne({
+        where: { 
+          id: tutoriadoId,
+          rol: 'estudiante_tutoriado'
+        }
+      });
+
+      if (!tutoriado) {
+        return res.status(400).json({ msg: "El usuario seleccionado no es un tutoriado válido" });
+      }
+
+      // Crear la asignación
       const tutoria = await Tutoria.create({
-        titulo: `Tutoría de ${materia}`,
-        materia,
-        costoPorHora,
+        tutorId,
+        tutoriadoId,
         profesorId,
-        estado: 'programada'
+        materia,
+        estado: 'activa'
       });
 
-      // Asignar tutor y tutoriado
-      await tutoria.addTutor(tutor);
-      await tutoria.addTutoriado(tutoriado);
-
-      // Obtener la tutoría con las relaciones
-      const tutoriaCompleta = await Tutoria.findByPk(tutoria.id, {
-        include: ['profesor', 'tutores', 'tutoriados']
+      res.status(201).json({
+        msg: "Tutor asignado exitosamente",
+        tutoria
       });
 
-      res.status(201).json(tutoriaCompleta);
     } catch (error) {
       console.error('Error al asignar tutor:', error);
       res.status(500).json({

@@ -1,45 +1,47 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import './TutoriasList.css';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from 'react-router-dom';
+import "./TutoriasList.css";
 
 export default function TutoriasList() {
   const [tutorias, setTutorias] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchTutorias = async () => {
       try {
         const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:4000/api/tutorias', {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         setTutorias(response.data);
       } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        setError(err.response?.data?.msg || 'Error al cargar las tutorías');
+        console.error('Error:', err);
       }
     };
 
     fetchTutorias();
   }, []);
 
-  if (loading) return <div>Cargando tutorías...</div>;
-  if (error) return <div className="error">{error}</div>;
-
   return (
     <div className="tutorias-list">
       <h2>Mis Tutorías</h2>
+      
+      {error && <div className="error-message">{error}</div>}
+      
+      <Link to="/estudiante_tutoriado/calendario">Ver Calendario</Link>
+
       <div className="tutorias-grid">
         {tutorias.map(tutoria => (
           <div key={tutoria.id} className="tutoria-card">
             <h3>{tutoria.titulo}</h3>
-            <p><strong>Materia:</strong> {tutoria.materia}</p>
-            <p><strong>Fecha:</strong> {new Date(tutoria.fecha).toLocaleDateString()}</p>
-            <p><strong>Horario:</strong> {tutoria.horaInicio} - {tutoria.horaFin}</p>
-            <p><strong>Estado:</strong> {tutoria.estado}</p>
-            <p><strong>Costo por hora:</strong> ${tutoria.costoPorHora}</p>
+            <p>Materia: {tutoria.materia}</p>
+            <p>Fecha: {new Date(tutoria.fecha).toLocaleDateString()}</p>
+            <p>Hora: {tutoria.hora_inicio} - {tutoria.hora_fin}</p>
+            <p>Estado: {tutoria.estado}</p>
           </div>
         ))}
       </div>

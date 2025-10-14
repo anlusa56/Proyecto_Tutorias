@@ -1,11 +1,11 @@
-require('./.env.config');
 const express = require("express");
-const sequelize = require("./sequelize");
 const cors = require("cors");
-require("dotenv").config();
+require("dotenv").config({
+  path: ['.env.local', '.env']
+});
 
-// Importar modelos
-const db = require('./models');
+// Importar modelos y conexión a DB
+const { sequelize, Usuario, Tutoria, Mensaje } = require('./models');
 
 const app = express();
 
@@ -22,19 +22,38 @@ const PORT = process.env.PORT || 4000;
 
 const startServer = async () => {
   try {
+    // Conectar a la base de datos
     await sequelize.authenticate();
     console.log("✅ Conexión establecida");
     
-    await sequelize.sync({ force: false }); // Cambiar a false después de la sincronización
-    console.log("🟢 Base de datos sincronizada");
-    
+    // Sincronizar todos los modelos
+    await sequelize.sync({ alter: true });
+    console.log("✅ Modelos sincronizados");
+
+    // Iniciar servidor
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
     });
+
+    // Manejar cierre gracioso
+    process.on('SIGTERM', async () => {
+      try {
+        console.log('🔄 Cerrando servidor...');
+        await sequelize.close();
+        process.exit(0);
+      } catch (err) {
+        console.error('❌ Error al cerrar:', err);
+        process.exit(1);
+      }
+    });
+
   } catch (error) {
-    console.error("❌ Error al iniciar servidor:", error);
+    console.error("❌ Error:", error.message);
+    if (error.original) {
+      console.error("Detalles:", error.original.message);
+    }
     process.exit(1);
   }
 };
 
-startServer();
+startServer().catch(console.error);

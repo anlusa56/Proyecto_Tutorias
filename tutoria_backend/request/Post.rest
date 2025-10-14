@@ -1,9 +1,0 @@
-POST http://localhost:4000/api/usuarios
-Content-Type: application/json
-
-{
-  "nombre": "An Maria",
-  "correo": "maiana56@gmail.com",
-  "contraseña": "11223345",
-  "rol": "admin"
-}

@@ -17,26 +17,35 @@ function AsignarTutorias({ onAsignar }) {
   const [tutoriados, setTutoriados] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     const cargarUsuarios = async () => {
       try {
         const token = localStorage.getItem('token');
-        
-        // Cargar tutores
+        const headers = { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
+        // Cargar solo tutores
         const resTutores = await fetch('http://localhost:4000/api/usuarios?rol=estudiante_tutor', {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers
         });
+        if (!resTutores.ok) throw new Error('Error al cargar tutores');
         const tutoresData = await resTutores.json();
         setTutores(tutoresData);
 
-        // Cargar tutoriados
+        // Cargar solo tutoriados
         const resTutoriados = await fetch('http://localhost:4000/api/usuarios?rol=estudiante_tutoriado', {
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers
         });
+        if (!resTutoriados.ok) throw new Error('Error al cargar tutoriados');
         const tutoriadosData = await resTutoriados.json();
         setTutoriados(tutoriadosData);
+
       } catch (err) {
+        console.error('Error:', err);
         setError('Error al cargar usuarios');
       }
     };
@@ -50,6 +59,8 @@ function AsignarTutorias({ onAsignar }) {
     setLoading(true);
 
     try {
+      console.log('Enviando datos:', formData); // Debug log
+
       const token = localStorage.getItem('token');
       const res = await fetch('http://localhost:4000/api/tutorias', {
         method: 'POST',
@@ -61,9 +72,11 @@ function AsignarTutorias({ onAsignar }) {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.msg);
+      console.log('Respuesta:', data); // Debug log
 
-      onAsignar(data);
+      if (!res.ok) throw new Error(data.msg || 'Error al crear tutoría');
+
+      setSuccess('Tutoría creada exitosamente');
       setFormData({
         tutorId: '',
         tutoriadoId: '',
@@ -74,6 +87,7 @@ function AsignarTutorias({ onAsignar }) {
         observaciones: ''
       });
     } catch (err) {
+      console.error('Error:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -163,6 +177,7 @@ function AsignarTutorias({ onAsignar }) {
         </div>
 
         {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
 
         <button type="submit" disabled={loading}>
           {loading ? 'Asignando...' : 'Asignar Tutoría'}

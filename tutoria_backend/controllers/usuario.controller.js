@@ -1,11 +1,24 @@
-const Usuario = require("../models/Usuario");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const { Usuario } = require('../models');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // Obtener todos los usuarios
 const obtenerUsuarios = async (req, res) => {
   try {
-    const usuarios = await Usuario.findAll({ attributes: { exclude: ["contraseña"] } });
+    const { rol } = req.query;
+    const whereClause = {};
+    
+    if (rol) {
+      whereClause.rol = rol;
+    }
+
+    const usuarios = await Usuario.findAll({
+      where: whereClause,
+      attributes: { 
+        exclude: ['contraseña']
+      }
+    });
+
     res.json(usuarios);
   } catch (error) {
     console.error("Error al obtener usuarios:", error);
@@ -96,20 +109,18 @@ const eliminarUsuario = async (req, res) => {
 // Login (devuelve token)
 const login = async (req, res) => {
   try {
-    const { correo, contraseña } = req.body;
-    
-    console.log('Intento de login:', correo);
+    const { correo } = req.body;
+    console.log('Intentando login con:', { correo });
 
     const usuario = await Usuario.findOne({ 
-      where: { correo } 
+      where: { correo }
     });
 
     if (!usuario) {
       return res.status(404).json({ msg: "Usuario no encontrado" });
     }
 
-    const valido = await bcrypt.compare(contraseña, usuario.contraseña);
-    
+    const valido = await bcrypt.compare(req.body.contraseña, usuario.contraseña);
     if (!valido) {
       return res.status(401).json({ msg: "Contraseña incorrecta" });
     }

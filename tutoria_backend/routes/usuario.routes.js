@@ -8,15 +8,16 @@ const {
   eliminarUsuario,
   login
 } = require("../controllers/usuario.controller");
+const { verificarToken } = require("../middlewares/auth"); // Añadimos esta importación
 
 // Rutas públicas
-router.post("/login", login); // Solo una ruta de login
+router.post("/login", login);
 router.post("/", crearUsuario);
 
 // Rutas que requieren autenticación
-router.get("/", obtenerUsuarios);
-router.get("/:id", obtenerUsuarioPorId);
-router.put("/:id", actualizarUsuario);
-router.delete("/:id", eliminarUsuario);
+router.get("/", verificarToken, obtenerUsuarios);
+router.get("/:id", verificarToken, obtenerUsuarioPorId);
+router.put("/:id", verificarToken, actualizarUsuario);
+router.delete("/:id", verificarToken, eliminarUsuario);
 
 module.exports = router;

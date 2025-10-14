@@ -4,31 +4,30 @@ const tutoriaController = require('../controllers/tutoriaController');
 const { verificarToken } = require('../middlewares/auth');
 const checkRol = require('../middlewares/checkRol');
 
-// Rutas públicas que requieren autenticación
-router.get('/', verificarToken, tutoriaController.getTutoriasByRol);
+// Middleware común para todas las rutas que requieren autenticación
+router.use(verificarToken);
+
+// Rutas públicas con autenticación
+router.get('/', tutoriaController.getTutoriasByRol);
 
 // Rutas para profesores y admin
 router.post('/', 
-  verificarToken, 
-  checkRol(['admin', 'profesor']), 
+  checkRol(['admin', 'profesor']),
   tutoriaController.crearTutoria
 );
 
 router.post('/asignar',
-  verificarToken,
   checkRol(['admin', 'profesor']),
   tutoriaController.asignarTutor
 );
 
-// Rutas solo para admin
+// Rutas exclusivas para admin
 router.put('/:id', 
-  verificarToken, 
   checkRol(['admin']), 
   tutoriaController.actualizarTutoria
 );
 
 router.delete('/:id', 
-  verificarToken, 
   checkRol(['admin']), 
   tutoriaController.eliminarTutoria
 );

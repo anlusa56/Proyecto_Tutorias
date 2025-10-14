@@ -4,25 +4,24 @@ require("dotenv").config();
 function verificarToken(req, res, next) {
   try {
     const authHeader = req.headers["authorization"];
+    console.log('Token recibido:', authHeader); // Debug
+
     if (!authHeader) {
       return res.status(401).json({ msg: "No hay token" });
     }
 
     const token = authHeader.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ msg: "Formato de token inválido" });
-    }
-
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
         console.error('Error de verificación:', err);
-        return res.status(401).json({ msg: "Token inválido o expirado" });
+        return res.status(401).json({ msg: "Token inválido" });
       }
+      console.log('Usuario decodificado:', decoded); // Debug
       req.usuario = decoded;
       next();
     });
   } catch (error) {
-    console.error('Error en verificación de token:', error);
+    console.error('Error en auth:', error);
     res.status(500).json({ msg: "Error en servidor" });
   }
 }

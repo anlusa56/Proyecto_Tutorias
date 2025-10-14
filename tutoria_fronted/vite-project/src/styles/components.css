@@ -1,0 +1,21 @@
+.tutor-profile,
+.calendario-tutorias,
+.materiales {
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tutor-info {
+  margin-top: 1rem;
+}
+
+.calendario-container {
+  margin-top: 1rem;
+  min-height: 400px;
+}
+
+.materiales-list {
+  margin-top: 1rem;
+}
