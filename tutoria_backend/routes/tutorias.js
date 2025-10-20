@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const tutoriaController = require('../controllers/tutoriaController');
+const tutoriaController = require('../controllers/tutoriasController');
 const { verificarToken } = require('../middlewares/auth');
 const checkRol = require('../middlewares/checkRol');
 

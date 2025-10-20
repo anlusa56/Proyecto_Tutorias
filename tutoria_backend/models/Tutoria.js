@@ -1,77 +1,63 @@
 'use strict';
 
-const { Model } = require('sequelize');
-
 module.exports = (sequelize, DataTypes) => {
-  class Tutoria extends Model {
-    static associate(models) {
-      // Relación con profesor
-      Tutoria.belongsTo(models.Usuario, {
-        as: 'profesor',
-        foreignKey: 'profesor_id'
-      });
-      
-      // Relación muchos a muchos con tutores
-      Tutoria.belongsToMany(models.Usuario, {
-        through: {
-          model: 'tutores_tutorias',
-          unique: false
-        },
-        as: 'tutores',
-        foreignKey: 'tutoria_id',
-        otherKey: 'usuario_id'
-      });
-
-      // Relación muchos a muchos con tutoriados
-      Tutoria.belongsToMany(models.Usuario, {
-        through: {
-          model: 'tutoriados_tutorias',
-          unique: false
-        },
-        as: 'tutoriados',
-        foreignKey: 'tutoria_id',
-        otherKey: 'usuario_id'
-      });
-
-      // Relación con mensajes
-      Tutoria.hasMany(models.Mensaje, {
-        as: 'mensajes',
-        foreignKey: 'tutoria_id'
-      });
-    }
-  }
-
-  Tutoria.init({
+  const Tutoria = sequelize.define('Tutoria', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
     titulo: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     materia: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     fecha: {
       type: DataTypes.DATEONLY,
-      allowNull: false
+      allowNull: false,
     },
     hora_inicio: {
       type: DataTypes.TIME,
-      allowNull: false
+      allowNull: false,
     },
     hora_fin: {
       type: DataTypes.TIME,
-      allowNull: false
+      allowNull: false,
+    },
+    observaciones: {
+      type: DataTypes.TEXT,
     },
     estado: {
-      type: DataTypes.ENUM('programada', 'en_curso', 'completada', 'cancelada'),
-      defaultValue: 'programada'
-    }
+      type: DataTypes.ENUM('programada', 'activa', 'finalizada', 'cancelada'),
+      defaultValue: 'programada',
+    },
   }, {
-    sequelize,
-    modelName: 'Tutoria',
-    tableName: 'tutorias',
+    tableName: 'Tutorias',
+    timestamps: true,
     underscored: true
   });
+
+  Tutoria.associate = (models) => {
+    Tutoria.belongsToMany(models.Usuario, {
+      through: 'tutores_tutorias',
+      as: 'tutores',
+      foreignKey: 'tutoria_id'
+    });
+
+    Tutoria.belongsToMany(models.Usuario, {
+      through: 'tutoriados_tutorias',
+      as: 'tutoriados',
+      foreignKey: 'tutoria_id'
+    });
+
+    Tutoria.hasMany(models.Mensaje, {
+      foreignKey: 'tutoriaId',
+      as: 'mensajes'
+    });
+  };
 
   return Tutoria;
 };
