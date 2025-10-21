@@ -1,22 +1,25 @@
 const { Model, DataTypes } = require('sequelize');
 
-module.exports = (sequelize) => {
+module.exports = (sequelize, DataTypes) => {
   class Usuario extends Model {
     static associate(models) {
+      // Cambiando los nombres de las asociaciones para que coincidan
       Usuario.belongsToMany(models.Tutoria, {
         through: 'tutores_tutorias',
-        as: 'tutoriasComoTutor',
-        foreignKey: 'usuario_id'
+        as: 'tutores',  // Cambiado de tutoriasComoTutor
+        foreignKey: 'usuario_id',
+        otherKey: 'tutoria_id'
       });
 
       Usuario.belongsToMany(models.Tutoria, {
         through: 'tutoriados_tutorias',
-        as: 'tutoriasComoTutoriado',
-        foreignKey: 'usuario_id'
+        as: 'tutoriados',  // Cambiado de tutoriasComoTutoriado
+        foreignKey: 'usuario_id',
+        otherKey: 'tutoria_id'
       });
 
       Usuario.hasMany(models.Tutoria, {
-        as: 'tutoriasComoProfesor',
+        as: 'profesor',  // Cambiado de tutoriasComoProfesor
         foreignKey: 'profesor_id'
       });
     }

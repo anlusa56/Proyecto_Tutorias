@@ -8,6 +8,10 @@ export default function AsignarTutorForm({ onAsignar }) {
     tutorId: '',
     tutoriadoId: '',
     materia: '',
+    fecha: '',
+    horaInicio: '',
+    horaFin: '',
+    observaciones: '',
     costoPorHora: ''
   });
   const [error, setError] = useState('');
@@ -23,9 +27,9 @@ export default function AsignarTutorForm({ onAsignar }) {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const tutoresData = await resTutores.json();
-        
+
         // Obtener tutoriados
-        const resTutoriados = await fetch('http://localhost:4000/api/usuarios?rol=estudiante_tutoriado', {
+        const resTutoriados = await fetch('http://localhost:4000/api/usuarios?rol=estudiante', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const tutoriadosData = await resTutoriados.json();
@@ -65,6 +69,10 @@ export default function AsignarTutorForm({ onAsignar }) {
         tutorId: '',
         tutoriadoId: '',
         materia: '',
+        fecha: '',
+        horaInicio: '',
+        horaFin: '',
+        observaciones: '',
         costoPorHora: ''
       });
     } catch (err) {
@@ -130,6 +138,53 @@ export default function AsignarTutorForm({ onAsignar }) {
           value={formData.materia}
           onChange={handleChange}
           required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="fecha">Fecha:</label>
+        <input
+          type="date"
+          id="fecha"
+          name="fecha"
+          value={formData.fecha}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="horaInicio">Hora de inicio:</label>
+        <input
+          type="time"
+          id="horaInicio"
+          name="horaInicio"
+          value={formData.horaInicio}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="horaFin">Hora de fin:</label>
+        <input
+          type="time"
+          id="horaFin"
+          name="horaFin"
+          value={formData.horaFin}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="observaciones">Observaciones:</label>
+        <textarea
+          id="observaciones"
+          name="observaciones"
+          value={formData.observaciones}
+          onChange={handleChange}
+          rows="3"
         />
       </div>
 
