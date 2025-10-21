@@ -62,7 +62,7 @@ function AsignarTutorias({ onAsignar }) {
       console.log('Enviando datos:', formData); // Debug log
 
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:4000/api/tutorias', {
+      const res = await fetch('http://localhost:4000/api/tutorias/asignar', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

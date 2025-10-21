@@ -6,7 +6,8 @@ const {
   crearUsuario,
   actualizarUsuario,
   eliminarUsuario,
-  login
+  login,
+  cambiarEstadoUsuario
 } = require("../controllers/usuario.controller");
 const { verificarToken } = require("../middlewares/auth");
 
@@ -19,5 +20,6 @@ router.get("/", verificarToken, obtenerUsuarios);
 router.get("/:id", verificarToken, obtenerUsuarioPorId);
 router.put("/:id", verificarToken, actualizarUsuario);
 router.delete("/:id", verificarToken, eliminarUsuario);
+router.patch('/:id/estado', verificarToken, cambiarEstadoUsuario);
 
 module.exports = router;

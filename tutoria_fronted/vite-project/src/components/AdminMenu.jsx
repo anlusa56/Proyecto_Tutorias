@@ -38,7 +38,7 @@ function GestionUsuarios() {
   const handleEstadoUsuario = async (userId, activo) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:4000/api/usuarios/${userId}`, {
+      const res = await fetch(`http://localhost:4000/api/usuarios/${userId}/estado`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

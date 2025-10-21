@@ -31,5 +31,6 @@ router.delete('/:id',
   checkRol(['admin']), 
   tutoriaController.eliminarTutoria
 );
+router.get('/profesor/:id', tutoriaController.getTutoriasByProfesor);
 
 module.exports = router;

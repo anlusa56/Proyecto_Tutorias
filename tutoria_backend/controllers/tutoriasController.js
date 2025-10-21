@@ -200,6 +200,29 @@ const eliminarTutoria = async (req, res) => {
     res.status(500).json({ msg: "Error al eliminar tutoría", error: error.message });
   }
 };
+// Controlador: obtener tutorías por profesor
+const getTutoriasByProfesor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const tutorias = await Tutoria.findAll({
+      where: { profesor_id: id },
+      include: [
+        { model: Usuario, as: 'tutor' },
+        { model: Usuario, as: 'tutoriado' }
+      ]
+    });
+
+    if (!tutorias.length) {
+      return res.status(404).json({ msg: 'No se encontraron tutorías para este profesor' });
+    }
+
+    res.json(tutorias);
+  } catch (error) {
+    console.error('Error al obtener tutorías por profesor:', error);
+    res.status(500).json({ msg: 'Error al obtener tutorías del profesor' });
+  }
+};
+
 
 // ✅ Exportar todo el controlador
 module.exports = {
@@ -208,5 +231,6 @@ module.exports = {
   getCalendarioTutorias,
   asignarTutor,
   actualizarTutoria,
-  eliminarTutoria
+  eliminarTutoria,
+  getTutoriasByProfesor
 };

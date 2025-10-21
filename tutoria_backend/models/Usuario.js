@@ -39,7 +39,12 @@ module.exports = (sequelize) => {
     rol: {
       type: DataTypes.ENUM('admin', 'profesor', 'estudiante_tutor', 'estudiante_tutoriado'),
       allowNull: false
-    }
+    },
+    activo: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    
   }, {
     sequelize,
     modelName: 'Usuario',

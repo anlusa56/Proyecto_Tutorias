@@ -46,6 +46,22 @@ async function deleteUser(id) {
   if (!res.ok) throw new Error(data.msg || "Error al eliminar usuario");
   return data;
 }
+async function updateUser(id, user) {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(user)
+  });
 
-export { getUsers, createUser, deleteUser };
-export default { getUsers, createUser, deleteUser };
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.msg || "Error al actualizar usuario");
+  return data;
+}
+
+
+export { getUsers, createUser, deleteUser, updateUser };
+export default { getUsers, createUser, deleteUser, updateUser };

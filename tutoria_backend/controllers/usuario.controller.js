@@ -94,6 +94,28 @@ const actualizarUsuario = async (req, res) => {
     res.status(500).json({ msg: "Error al actualizar usuario" });
   }
 };
+// Activar / desactivar usuario
+const cambiarEstadoUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { activo } = req.body;
+
+    const usuario = await Usuario.findByPk(id);
+    if (!usuario) return res.status(404).json({ msg: "Usuario no encontrado" });
+
+    usuario.activo = activo;
+    await usuario.save();
+
+    res.json({ 
+      msg: `Usuario ${activo ? "activado" : "desactivado"} correctamente`,
+      usuario: { id: usuario.id, nombre: usuario.nombre, activo: usuario.activo }
+    });
+  } catch (error) {
+    console.error("Error al cambiar estado:", error);
+    res.status(500).json({ msg: "Error al cambiar estado del usuario" });
+  }
+};
+
 
 // Eliminar usuario
 const eliminarUsuario = async (req, res) => {
@@ -109,18 +131,21 @@ const eliminarUsuario = async (req, res) => {
 // Login (devuelve token)
 const login = async (req, res) => {
   try {
-    const { correo } = req.body;
+    const { correo, contraseña } = req.body;
     console.log('Intentando login con:', { correo });
 
-    const usuario = await Usuario.findOne({ 
-      where: { correo }
-    });
+    const usuario = await Usuario.findOne({ where: { correo } });
 
     if (!usuario) {
       return res.status(404).json({ msg: "Usuario no encontrado" });
     }
 
-    const valido = await bcrypt.compare(req.body.contraseña, usuario.contraseña);
+    // Si no es admin y no está activo → denegar acceso
+    if (usuario.rol !== 'admin' && !usuario.activo) {
+      return res.status(403).json({ msg: "Tu cuenta aún no ha sido activada por el administrador" });
+    }
+
+    const valido = await bcrypt.compare(contraseña, usuario.contraseña);
     if (!valido) {
       return res.status(401).json({ msg: "Contraseña incorrecta" });
     }
@@ -142,7 +167,8 @@ const login = async (req, res) => {
         id: usuario.id,
         nombre: usuario.nombre,
         correo: usuario.correo,
-        rol: usuario.rol
+        rol: usuario.rol,
+        activo: usuario.activo
       }
     });
 
@@ -155,6 +181,7 @@ const login = async (req, res) => {
   }
 };
 
+
 module.exports = {
   obtenerUsuarios,
   obtenerUsuarioPorId,
@@ -162,4 +189,6 @@ module.exports = {
   actualizarUsuario,
   eliminarUsuario,
   login,
+  cambiarEstadoUsuario
 };
+
