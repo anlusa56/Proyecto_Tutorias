@@ -1,81 +1,77 @@
 import { useState, useEffect, useRef } from 'react';
 import './Chat.css';
 
-export default function Chat({ tutoria, usuario }) {
+function Chat({ tutoria, usuario }) {
   const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [error, setError] = useState('');
   const chatContainerRef = useRef(null);
 
-  // Obtener mensajes
+  // Cargar mensajes
   useEffect(() => {
     const cargarMensajes = async () => {
       try {
-        const otroUsuarioId = usuario.rol === 'estudiante_tutor' 
-          ? tutoria.tutoriados[0]?.id 
-          : tutoria.tutores[0]?.id;
-
-        const res = await fetch(
-          `http://localhost:4000/api/mensajes?tutoriaId=${tutoria.id}&otroUsuarioId=${otroUsuarioId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:4000/api/mensajes/tutoria/${tutoria.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
-        );
+        });
 
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.msg);
-        
+        if (!response.ok) throw new Error('Error al cargar mensajes');
+        const data = await response.json();
         setMensajes(data);
+        scrollToBottom();
       } catch (err) {
-        setError(err.message);
+        setError('Error al cargar mensajes: ' + err.message);
       }
     };
 
     cargarMensajes();
-    // Actualizar cada 5 segundos
-    const interval = setInterval(cargarMensajes, 5000);
-    return () => clearInterval(interval);
-  }, [tutoria.id, usuario.rol]);
+    // Actualizar mensajes cada 5 segundos
+    const intervalo = setInterval(cargarMensajes, 5000);
+    return () => clearInterval(intervalo);
+  }, [tutoria.id]);
 
   // Scroll al último mensaje
-  useEffect(() => {
+  const scrollToBottom = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [mensajes]);
+  };
 
+  // Enviar mensaje
   const enviarMensaje = async (e) => {
     e.preventDefault();
     if (!nuevoMensaje.trim()) return;
 
     try {
-      const otroUsuarioId = usuario.rol === 'estudiante_tutor' 
-        ? tutoria.tutoriados[0]?.id 
-        : tutoria.tutores[0]?.id;
+      const token = localStorage.getItem('token');
+      const receptorId = usuario.rol === 'estudiante_tutor' 
+        ? tutoria.tutoriados[0].id 
+        : tutoria.tutores[0].id;
 
-      const res = await fetch('http://localhost:4000/api/mensajes', {
+      const response = await fetch('http://localhost:4000/api/mensajes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          contenido: nuevoMensaje,
-          receptorId: otroUsuarioId,
-          tutoriaId: tutoria.id
+          tutoriaId: tutoria.id,
+          receptorId,
+          contenido: nuevoMensaje
         })
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg);
-
-      setMensajes([...mensajes, data]);
+      if (!response.ok) throw new Error('Error al enviar mensaje');
+      
+      const mensajeEnviado = await response.json();
+      setMensajes([...mensajes, mensajeEnviado]);
       setNuevoMensaje('');
-      setError('');
+      scrollToBottom();
     } catch (err) {
-      setError(err.message);
+      setError('Error al enviar mensaje: ' + err.message);
     }
   };
 
@@ -83,36 +79,37 @@ export default function Chat({ tutoria, usuario }) {
     <div className="chat-container">
       <div className="chat-header">
         <h3>Chat de Tutoría: {tutoria.materia}</h3>
+        {error && <div className="error-message">{error}</div>}
       </div>
 
       <div className="chat-messages" ref={chatContainerRef}>
         {mensajes.map(mensaje => (
-          <div 
-            key={mensaje.id} 
-            className={`mensaje ${mensaje.emisorId === usuario.id ? 'enviado' : 'recibido'}`}
+          <div
+            key={mensaje.id}
+            className={`mensaje ${mensaje.emisor_id === usuario.id ? 'mensaje-enviado' : 'mensaje-recibido'}`}
           >
-            <p className="mensaje-contenido">{mensaje.contenido}</p>
-            <span className="mensaje-hora">
-              {new Date(mensaje.createdAt).toLocaleTimeString()}
-            </span>
+            <div className="mensaje-contenido">
+              <p>{mensaje.contenido}</p>
+              <small>
+                {mensaje.emisor.nombre} - 
+                {new Date(mensaje.created_at).toLocaleTimeString()}
+              </small>
+            </div>
           </div>
         ))}
       </div>
 
-      {error && <p className="error-message">{error}</p>}
-
-      <form onSubmit={enviarMensaje} className="chat-form">
+      <form onSubmit={enviarMensaje} className="chat-input">
         <input
           type="text"
           value={nuevoMensaje}
           onChange={(e) => setNuevoMensaje(e.target.value)}
           placeholder="Escribe un mensaje..."
-          className="chat-input"
         />
-        <button type="submit" className="chat-send-btn">
-          Enviar
-        </button>
+        <button type="submit">Enviar</button>
       </form>
     </div>
   );
 }
+
+export default Chat;

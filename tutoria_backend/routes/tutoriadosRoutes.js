@@ -1,8 +1,12 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { obtenerTutoriadosPorTutor } = require("../controllers/tutoriadosController.js");
+const tutoriadosController = require('../controllers/tutoriadosController');
+const { verificarToken } = require('../middlewares/auth');
 
-// Ruta para obtener tutoriados de un tutor específico
-router.get("/tutor/:idTutor", obtenerTutoriadosPorTutor);
+// Apply verificarToken middleware to all routes
+router.use(verificarToken);
+
+// Obtener tutoriados asignados a un tutor
+router.get('/tutor/:id', tutoriadosController.getTutoriadosByTutor);
 
 module.exports = router;

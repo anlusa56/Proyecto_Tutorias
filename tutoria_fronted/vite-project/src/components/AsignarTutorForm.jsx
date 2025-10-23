@@ -9,8 +9,8 @@ export default function AsignarTutorForm({ onAsignar }) {
     tutoriadoId: '',
     materia: '',
     fecha: '',
-    horaInicio: '',
-    horaFin: '',
+    hora_inicio: '',
+    hora_fin: '',
     observaciones: '',
     costoPorHora: ''
   });
@@ -62,7 +62,7 @@ export default function AsignarTutorForm({ onAsignar }) {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.msg);
+      if (!res.ok) throw new Error(data.msg || 'Error al asignar tutoría');
 
       onAsignar(data);
       setFormData({
@@ -70,13 +70,14 @@ export default function AsignarTutorForm({ onAsignar }) {
         tutoriadoId: '',
         materia: '',
         fecha: '',
-        horaInicio: '',
-        horaFin: '',
+        hora_inicio: '',
+        hora_fin: '',
         observaciones: '',
         costoPorHora: ''
       });
     } catch (err) {
       setError(err.message);
+      console.error('Error al asignar tutoría:', err);
     } finally {
       setLoading(false);
     }
@@ -158,8 +159,8 @@ export default function AsignarTutorForm({ onAsignar }) {
         <input
           type="time"
           id="horaInicio"
-          name="horaInicio"
-          value={formData.horaInicio}
+          name="hora_inicio"
+          value={formData.hora_inicio}
           onChange={handleChange}
           required
         />
@@ -170,8 +171,8 @@ export default function AsignarTutorForm({ onAsignar }) {
         <input
           type="time"
           id="horaFin"
-          name="horaFin"
-          value={formData.horaFin}
+          name="hora_fin"
+          value={formData.hora_fin}
           onChange={handleChange}
           required
         />

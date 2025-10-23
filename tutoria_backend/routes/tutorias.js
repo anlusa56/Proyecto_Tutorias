@@ -1,36 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const tutoriaController = require('../controllers/tutoriasController');
-const { verificarToken } = require('../middlewares/auth');
-const checkRol = require('../middlewares/checkRol');
+const { 
+    crearTutoria,
+    getTutoriasByRol,
+    getCalendarioTutorias,
+    asignarTutoria,
+    actualizarTutoria,
+    eliminarTutoria,
+    getTutoriasByProfesor,
+    getTutoriasByTutor
+} = require('../controllers/tutoriasController');
 
-// Middleware común para todas las rutas que requieren autenticación
-router.use(verificarToken);
+const { validarJWT } = require('../middleware/validar-jwt');
 
-// Rutas públicas con autenticación
-router.get('/', tutoriaController.getTutoriasByRol);
+// Aplicar validación JWT a todas las rutas
+router.use(validarJWT);
 
-// Rutas para profesores y admin
-router.post('/', 
-  checkRol(['admin', 'profesor']),
-  tutoriaController.crearTutoria
-);
+// Rutas base
+router.post('/', crearTutoria);
+router.post('/asignar', asignarTutoria);
+router.get('/rol', getTutoriasByRol);
+router.get('/calendario', getCalendarioTutorias);
 
-router.post('/asignar',
-  checkRol(['admin', 'profesor']),
-  tutoriaController.asignarTutor
-);
-
-// Rutas exclusivas para admin
-router.put('/:id', 
-  checkRol(['admin']), 
-  tutoriaController.actualizarTutoria
-);
-
-router.delete('/:id', 
-  checkRol(['admin']), 
-  tutoriaController.eliminarTutoria
-);
-router.get('/profesor/:id', tutoriaController.getTutoriasByProfesor);
+// Rutas específicas
+router.get('/profesor/:id', getTutoriasByProfesor);
+router.get('/tutor/:id', getTutoriasByTutor);
+router.put('/:id', actualizarTutoria);
+router.delete('/:id', eliminarTutoria);
 
 module.exports = router;

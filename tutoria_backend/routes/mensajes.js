@@ -3,8 +3,16 @@ const router = express.Router();
 const mensajeController = require('../controllers/mensajeController');
 const { verificarToken } = require('../middlewares/auth');
 
-router.post('/', verificarToken, mensajeController.enviarMensaje);
-router.get('/', verificarToken, mensajeController.obtenerMensajes);
-router.patch('/:mensajeId/leido', verificarToken, mensajeController.marcarComoLeido);
+// Proteger todas las rutas con verificación de token
+router.use(verificarToken);
+
+// Obtener mensajes de una tutoría
+router.get('/tutoria/:tutoriaId', mensajeController.getMensajesByTutoria);
+
+// Enviar un mensaje
+router.post('/', mensajeController.enviarMensaje);
+
+// Marcar mensaje como leído
+router.put('/:mensajeId/leido', mensajeController.marcarComoLeido);
 
 module.exports = router;

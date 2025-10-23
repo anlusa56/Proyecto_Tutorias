@@ -2,15 +2,20 @@ import { useState, useEffect } from "react";
 import { Link, Routes, Route, Navigate } from "react-router-dom";
 import '../styles/MenuCommon.css';
 import './TutorMenu.css';
+import Chat from './Chat';
 
 export default function TutorMenu({ usuario, onLogout }) {
   const [tutorias, setTutorias] = useState([]);
   const [tutoriados, setTutoriados] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const cargarDatos = async () => {
       try {
+        setLoading(true);
+        setError("");
+
         // Cargar tutorías
         const resTutorias = await fetch(`http://localhost:4000/api/tutorias/tutor/${usuario.id}`, {
           headers: {
@@ -19,7 +24,7 @@ export default function TutorMenu({ usuario, onLogout }) {
         });
         
         const dataTutorias = await resTutorias.json();
-        if (!resTutorias.ok) throw new Error(dataTutorias.msg);
+        if (!resTutorias.ok) throw new Error(dataTutorias.msg || 'Error al cargar tutorías');
         setTutorias(dataTutorias);
 
         // Cargar tutoriados
@@ -30,39 +35,63 @@ export default function TutorMenu({ usuario, onLogout }) {
         });
 
         const dataTutoriados = await resTutoriados.json();
-        if (!resTutoriados.ok) throw new Error(dataTutoriados.msg);
-        setTutoriados(dataTutoriados);
+        if (!resTutoriados.ok) {
+          if (resTutoriados.status === 404) {
+            setTutoriados([]);
+          } else {
+            throw new Error(dataTutoriados.msg || 'Error al cargar tutoriados');
+          }
+        } else {
+          setTutoriados(dataTutoriados);
+        }
 
       } catch (err) {
+        console.error('Error:', err);
         setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     cargarDatos();
   }, [usuario.id]);
 
+  if (loading) {
+    return (
+      <div className="menu-container">
+        <nav className="menu-nav">
+          <ul>
+            <li><Link to="/estudiante_tutor/tutorias">Mis Tutorías</Link></li>
+            <li><Link to="/estudiante_tutor/tutoriados">Mis Tutoriados</Link></li>
+            <li><Link to="/estudiante_tutor/avances">Registrar Avances</Link></li>
+            <li><button onClick={onLogout}>Cerrar Sesión</button></li>
+          </ul>
+        </nav>
+        <div className="menu-content loading">
+          <div className="loading-spinner"></div>
+          <p>Cargando datos...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="menu-container">
       <nav className="menu-nav">
         <ul>
-          {/* Usar rutas absolutas para evitar acumulación */}
           <li><Link to="/estudiante_tutor/tutorias">Mis Tutorías</Link></li>
           <li><Link to="/estudiante_tutor/tutoriados">Mis Tutoriados</Link></li>
           <li><Link to="/estudiante_tutor/avances">Registrar Avances</Link></li>
-          <li><Link to="/estudiante_tutor/feedback">Retroalimentación</Link></li>
           <li><button onClick={onLogout}>Cerrar Sesión</button></li>
         </ul>
       </nav>
 
       <div className="menu-content">
         <Routes>
-          {/* Mantener rutas relativas en Routes */}
           <Route path="/" element={<Navigate to="tutorias" replace />} />
-          <Route path="tutorias" element={<MisTutorias tutorias={tutorias} error={error} />} />
+          <Route path="tutorias" element={<MisTutorias tutorias={tutorias} error={error} usuario={usuario} />} />
           <Route path="tutoriados" element={<MisTutoriados tutoriados={tutoriados} error={error} />} />
           <Route path="avances" element={<RegistrarAvances tutoriados={tutoriados} />} />
-          <Route path="feedback" element={<Retroalimentacion />} />
-          {/* Redirigir rutas incorrectas usando ruta absoluta */}
           <Route path="*" element={<Navigate to="/estudiante_tutor/tutorias" replace />} />
         </Routes>
       </div>
@@ -70,7 +99,9 @@ export default function TutorMenu({ usuario, onLogout }) {
   );
 }
 
-function MisTutorias({ tutorias, error }) {
+function MisTutorias({ tutorias, error, usuario }) {
+  const [tutoriaSeleccionada, setTutoriaSeleccionada] = useState(null);
+
   return (
     <div className="tutorias-list">
       <h2>Mis Tutorías como Tutor</h2>
@@ -84,6 +115,15 @@ function MisTutorias({ tutorias, error }) {
               <p>Fecha: {new Date(tutoria.fecha).toLocaleString()}</p>
               <p>Estado: {tutoria.estado}</p>
               <p>Estudiantes: {tutoria.tutoriados?.length || 0}</p>
+              <button 
+                onClick={() => setTutoriaSeleccionada(tutoriaSeleccionada?.id === tutoria.id ? null : tutoria)}
+                className="chat-button"
+              >
+                {tutoriaSeleccionada?.id === tutoria.id ? 'Cerrar Chat' : 'Abrir Chat'}
+              </button>
+              {tutoriaSeleccionada?.id === tutoria.id && (
+                <Chat tutoria={tutoria} usuario={usuario} />
+              )}
             </div>
           ))}
         </div>
@@ -147,8 +187,10 @@ function RegistrarAvances({ tutoriados }) {
         body: JSON.stringify(formData)
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.msg || 'Error al registrar avance');
+      }
 
       setSuccess(true);
       setFormData({
@@ -243,69 +285,6 @@ function RegistrarAvances({ tutoriados }) {
           {loading ? 'Guardando...' : 'Guardar Avance'}
         </button>
       </form>
-    </div>
-  );
-}
-
-function Retroalimentacion() {
-  const [retroalimentaciones, setRetroalimentaciones] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const cargarRetroalimentaciones = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:4000/api/retroalimentaciones/tutor', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.msg);
-        setRetroalimentaciones(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    cargarRetroalimentaciones();
-  }, []);
-
-  if (loading) return <div className="loading">Cargando retroalimentaciones...</div>;
-  if (error) return <div className="error-message">{error}</div>;
-
-  return (
-    <div className="section-container">
-      <h2>Retroalimentación del Profesor</h2>
-      
-      {retroalimentaciones.length > 0 ? (
-        <div className="retroalimentaciones-grid">
-          {retroalimentaciones.map(retro => (
-            <div key={retro.id} className="retroalimentacion-card">
-              <div className="retroalimentacion-header">
-                <h3>{retro.titulo}</h3>
-                <span className="fecha">{new Date(retro.fecha).toLocaleDateString()}</span>
-              </div>
-              <p className="profesor-nombre">De: {retro.profesor.nombre}</p>
-              <div className="retroalimentacion-content">
-                <p>{retro.contenido}</p>
-              </div>
-              {retro.calificacion && (
-                <div className="calificacion">
-                  <span>Calificación:</span>
-                  <strong>{retro.calificacion}/10</strong>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p>No hay retroalimentaciones disponibles</p>
-      )}
     </div>
   );
 }

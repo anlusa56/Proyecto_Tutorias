@@ -9,8 +9,8 @@ function AsignarTutorias({ onAsignar }) {
     tutoriadoId: '',
     materia: '',
     fecha: '',
-    horaInicio: '',
-    horaFin: '',
+    hora_inicio: '',
+    hora_fin: '',
     observaciones: ''
   });
   const [tutores, setTutores] = useState([]);
@@ -65,38 +65,41 @@ function AsignarTutorias({ onAsignar }) {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       };
-  
-      // Crear y asignar la tutoría en una sola llamada
+
+      // Convertir IDs a números y asegurar el formato correcto de los datos
+      const tutoriaData = {
+        tutor_id: Number(formData.tutorId),
+        tutoriado_id: Number(formData.tutoriadoId),
+        materia: formData.materia.trim(),
+        fecha: formData.fecha,
+        hora_inicio: formData.hora_inicio,
+        hora_fin: formData.hora_fin,
+        observaciones: formData.observaciones?.trim() || ''
+      };
+
       const response = await fetch('http://localhost:4000/api/tutorias/asignar', {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          tutorId: parseInt(formData.tutorId),
-          tutoriadoId: parseInt(formData.tutoriadoId),
-          materia: formData.materia,
-          fecha: formData.fecha,
-          hora_inicio: formData.horaInicio,
-          hora_fin: formData.horaFin,
-          observaciones: formData.observaciones || ''
-        })
+        body: JSON.stringify(tutoriaData)
       });
-  
+
       const data = await response.json();
-      console.log('Respuesta del servidor:', data);
       
-      if (!response.ok) throw new Error(data.msg || 'Error al crear la tutoría');
-  
+      if (!response.ok) {
+        throw new Error(data.error || data.msg || 'Error al crear la tutoría');
+      }
+
       setSuccess('Tutoría creada y asignada exitosamente 🎉');
       setFormData({
         tutorId: '',
         tutoriadoId: '',
         materia: '',
         fecha: '',
-        horaInicio: '',
-        horaFin: '',
+        hora_inicio: '',
+        hora_fin: '',
         observaciones: ''
       });
-  
+
     } catch (err) {
       console.error('❌ Error detallado:', err);
       setError(err.message);
@@ -162,8 +165,8 @@ function AsignarTutorias({ onAsignar }) {
             <label>Hora Inicio:</label>
             <input
               type="time"
-              value={formData.horaInicio}
-              onChange={(e) => setFormData({...formData, horaInicio: e.target.value})}
+              value={formData.hora_inicio}
+              onChange={(e) => setFormData({...formData, hora_inicio: e.target.value})}
               required
             />
           </div>
@@ -172,8 +175,8 @@ function AsignarTutorias({ onAsignar }) {
             <label>Hora Fin:</label>
             <input
               type="time"
-              value={formData.horaFin}
-              onChange={(e) => setFormData({...formData, horaFin: e.target.value})}
+              value={formData.hora_fin}
+              onChange={(e) => setFormData({...formData, hora_fin: e.target.value})}
               required
             />
           </div>
@@ -212,9 +215,10 @@ function SeguimientoTutorias({ usuario }) {
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.msg);
+        if (!res.ok) throw new Error(data.msg || 'Error al obtener tutorías');
         setTutorias(data);
       } catch (err) {
+        console.error('❌ Error al cargar tutorías:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -237,11 +241,12 @@ function SeguimientoTutorias({ usuario }) {
               <h3>{tutoria.materia}</h3>
               <span className={`estado ${tutoria.estado}`}>{tutoria.estado}</span>
             </div>
+
             <div className="tutoria-info">
-            <p><strong>Tutor:</strong> {tutoria.tutores?.[0]?.nombre}</p>
-            <p><strong>Estudiante:</strong> {tutoria.tutoriados?.[0]?.nombre}</p>
+              <p><strong>Tutor:</strong> {tutoria.tutoriasComoTutor?.[0]?.nombre || '-'}</p>
+              <p><strong>Estudiante:</strong> {tutoria.tutoriasComoTutoriado?.[0]?.nombre || '-'}</p>
               <p><strong>Fecha:</strong> {new Date(tutoria.fecha).toLocaleDateString()}</p>
-              <p><strong>Horario:</strong> {tutoria.horaInicio} - {tutoria.horaFin}</p>
+              <p><strong>Horario:</strong> {tutoria.hora_inicio} - {tutoria.hora_fin}</p>
               {tutoria.observaciones && (
                 <p><strong>Observaciones:</strong> {tutoria.observaciones}</p>
               )}
@@ -252,6 +257,7 @@ function SeguimientoTutorias({ usuario }) {
     </div>
   );
 }
+
 
 function Reportes() {
   const [estadisticas, setEstadisticas] = useState({

@@ -1,26 +1,50 @@
-import pool from "../database/conexion.js";
+const { Usuario, Tutoria, sequelize } = require('../models');
 
-// Controlador: Obtener tutoriados por tutor
-export const obtenerTutoriadosPorTutor = async (req, res) => {
-  const { idTutor } = req.params;
-
+const getTutoriadosByTutor = async (req, res) => {
   try {
-    // Consulta SQL (ajusta los nombres de tablas y columnas si difieren)
-    const result = await pool.query(
-      `SELECT t.id, t.nombre, t.correo, t.carrera, t.semestre
-       FROM tutoriados t
-       INNER JOIN tutorias tu ON t.id = tu.id_tutoriado
-       WHERE tu.id_tutor = $1`,
-      [idTutor]
-    );
+    const { id } = req.params;
+    console.log('🔍 Buscando tutoriados para el tutor:', id);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ mensaje: "No se encontraron tutoriados para este tutor." });
+    // Obtener todos los tutoriados asignados a las tutorías donde este usuario es tutor
+    const tutoriados = await Usuario.findAll({
+      attributes: ['id', 'nombre', 'correo'],
+      include: [{
+        model: Tutoria,
+        as: 'tutoriasComoTutoriado',
+        required: true,
+        attributes: ['id', 'materia', 'fecha', 'estado'],
+        include: [{
+          model: Usuario,
+          as: 'tutores',
+          where: { id },
+          attributes: []  // No necesitamos los atributos del tutor
+        }]
+      }]
+    });
+
+    console.log('👥 Tutoriados encontrados:', tutoriados.length);
+
+    if (tutoriados.length === 0) {
+      return res.status(404).json({
+        msg: 'No se encontraron tutoriados asignados a este tutor',
+        debug: { tutorId: id }
+      });
     }
 
-    res.json(result.rows);
+    res.json(tutoriados);
   } catch (error) {
-    console.error("Error al obtener tutoriados:", error);
-    res.status(500).json({ mensaje: "Error al obtener tutoriados." });
+    console.error('❌ Error al obtener tutoriados:', {
+      message: error.message,
+      stack: error.stack,
+      tutorId: req.params.id
+    });
+    res.status(500).json({ 
+      msg: 'Error al obtener tutoriados',
+      error: error.message 
+    });
   }
+};
+
+module.exports = {
+  getTutoriadosByTutor
 };

@@ -96,6 +96,78 @@
   font-size: 18px;
 }
 
+.tutoria-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.chat-button:hover {
+  background-color: #0056b3;
+}
+
+.tutoria-card h3 {
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.tutoria-card p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.tutorias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+/* Estilos para las tarjetas que tienen el chat abierto */
+.tutoria-card:has(.chat-container) {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+.menu-content.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Estilos responsivos */
 @media (max-width: 768px) {
   .retroalimentaciones-grid {

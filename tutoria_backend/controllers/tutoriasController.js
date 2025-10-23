@@ -5,46 +5,23 @@ const { Op } = require('sequelize');
 // ✅ Crear tutoría
 const crearTutoria = async (req, res) => {
   try {
-    const { tutorId, tutoriadoId, materia, fecha, horaInicio, horaFin, observaciones } = req.body;
-    const profesorId = req.usuario.id;
-
-    console.log('📥 Datos recibidos para crear tutoría:', {
-      tutorId, tutoriadoId, materia, fecha, horaInicio, horaFin, observaciones, profesorId
-    });
-
+    const { materia, fecha, hora_inicio, hora_fin, observaciones } = req.body;
+    
     const tutoria = await Tutoria.create({
-      titulo: `Tutoría de ${materia}`,
+      titulo: `Tutoría de ${materia}`, // Agregamos el título automáticamente
       materia,
       fecha,
-      hora_inicio: horaInicio,
-      hora_fin: horaFin,
+      hora_inicio,
+      hora_fin,
       observaciones,
-      profesor_id: profesorId,
       estado: 'programada'
     });
 
-    await Promise.all([
-      tutoria.setTutores([tutorId]),
-      tutoria.setTutoriados([tutoriadoId])
-    ]);
-
-    const tutoriaCompleta = await Tutoria.findByPk(tutoria.id, {
-      include: [
-        { model: Usuario, as: 'profesor' },
-        { model: Usuario, as: 'tutores' },
-        { model: Usuario, as: 'tutoriados' }
-      ]
-    });
-
-    res.status(201).json({
-      msg: "✅ Tutoría creada exitosamente",
-      tutoria: tutoriaCompleta
-    });
-
+    res.status(201).json(tutoria);
   } catch (error) {
-    console.error('❌ Error al crear tutoría:', error);
+    console.error(error);
     res.status(500).json({
-      msg: "Error al crear tutoría",
+      msg: 'Error al crear la tutoría',
       error: error.message
     });
   }
@@ -60,20 +37,38 @@ const getTutoriasByRol = async (req, res) => {
       case 'profesor':
         tutorias = await Tutoria.findAll({
           where: { profesor_id: id },
-          include: ['tutores', 'tutoriados']
+          include: [
+            { 
+              model: Usuario, 
+              as: 'tutoriasComoTutor', 
+              attributes: ['id', 'nombre'],
+              required: true 
+            },
+            { 
+              model: Usuario, 
+              as: 'tutoriasComoTutoriado', 
+              attributes: ['id', 'nombre'],
+              required: true 
+            }
+          ]
         });
         break;
       case 'admin':
         tutorias = await Tutoria.findAll({
-          include: ['profesor', 'tutores', 'tutoriados']
+          include: [
+            { model: Usuario, as: 'profesor', attributes: ['id', 'nombre'] },
+            { model: Usuario, as: 'tutoriasComoTutor', attributes: ['id', 'nombre'] },
+            { model: Usuario, as: 'tutoriasComoTutoriado', attributes: ['id', 'nombre'] }
+          ]
         });
         break;
       case 'estudiante_tutor':
         tutorias = await Tutoria.findAll({
           include: [{
             model: Usuario,
-            as: 'tutores',
-            where: { id }
+            as: 'tutoriasComoTutor',
+            where: { id },
+            attributes: ['id', 'nombre']
           }]
         });
         break;
@@ -81,8 +76,9 @@ const getTutoriasByRol = async (req, res) => {
         tutorias = await Tutoria.findAll({
           include: [{
             model: Usuario,
-            as: 'tutoriados',
-            where: { id }
+            as: 'tutoriasComoTutoriado',
+            where: { id },
+            attributes: ['id', 'nombre']
           }]
         });
         break;
@@ -107,14 +103,31 @@ const getCalendarioTutorias = async (req, res) => {
       where: {
         [Op.or]: [
           { profesor_id: req.usuario.id },
-          { '$tutores.id$': req.usuario.id },
-          { '$tutoriados.id$': req.usuario.id }
+          { '$tutoriasComoTutor.id$': req.usuario.id },
+          { '$tutoriasComoTutoriado.id$': req.usuario.id }
         ]
       },
       include: [
-        { model: Usuario, as: 'profesor', attributes: ['id', 'nombre'] },
-        { model: Usuario, as: 'tutores', attributes: ['id', 'nombre'] },
-        { model: Usuario, as: 'tutoriados', attributes: ['id', 'nombre'] }
+        { 
+          model: Usuario, 
+          as: 'profesor', 
+          attributes: ['id', 'nombre'],
+          required: true 
+        },
+        { 
+          model: Usuario, 
+          as: 'tutoriasComoTutor', 
+          attributes: ['id', 'nombre'], 
+          through: { attributes: [] },
+          required: true 
+        },
+        { 
+          model: Usuario, 
+          as: 'tutoriasComoTutoriado', 
+          attributes: ['id', 'nombre'], 
+          through: { attributes: [] },
+          required: true 
+        }
       ],
       order: [['fecha', 'ASC']]
     });
@@ -122,95 +135,65 @@ const getCalendarioTutorias = async (req, res) => {
     res.json(tutorias);
   } catch (error) {
     console.error('❌ Error al obtener calendario:', error);
-    res.status(500).json({ msg: 'Error al obtener calendario', error: error.message });
+    res.status(500).json({ 
+      msg: 'Error al obtener calendario', 
+      error: error.message 
+    });
   }
 };
 
 // ✅ Asignar tutor a tutoriado
-const asignarTutor = async (req, res) => {
-  const transaction = await sequelize.transaction();
-  
+const asignarTutoria = async (req, res) => {
+  let transaction;
+
   try {
-    const { tutorId, tutoriadoId, materia, fecha, hora_inicio, hora_fin, observaciones } = req.body;
-    const profesorId = req.usuario.id;
+    // Verifica que el usuario autenticado sea un profesor
+    if (!req.usuario || req.usuario.rol !== 'profesor') {
+      return res.status(403).json({ msg: 'Solo los profesores pueden asignar tutorías.' });
+    }
 
-    console.log('📥 [1] Iniciando creación de tutoría con datos:', {
-      tutorId, tutoriadoId, materia, fecha, hora_inicio, hora_fin, observaciones, profesorId
-    });
+    const profesor_id = req.usuario.id; // 👈 se obtiene del token JWT
+    const { tutor_id, tutoriado_id, materia, fecha, hora_inicio, hora_fin, observaciones } = req.body;
 
-    // 1. Crear la tutoría primero
+    transaction = await sequelize.transaction();
+
+    // ✅ Crear la tutoría con profesor_id
     const tutoria = await Tutoria.create({
       titulo: `Tutoría de ${materia}`,
       materia,
       fecha,
       hora_inicio,
       hora_fin,
-      descripcion: observaciones, // Cambiado a descripcion según el modelo
-      profesor_id: profesorId,
-      estado: 'programada'
+      observaciones,
+      estado: 'programada',
+      profesor_id // 👈 aquí está la clave
     }, { transaction });
 
-    console.log('✅ [2] Tutoría creada con ID:', tutoria.id);
-
-    // 2. Crear las asociaciones usando setTutores y setTutoriados
+    // ✅ Crear las relaciones tutor-tutoriado
     await Promise.all([
-      tutoria.setTutores([tutorId], { transaction }),
-      tutoria.setTutoriados([tutoriadoId], { transaction })
+      sequelize.models.tutores_tutorias.create({
+        tutoria_id: tutoria.id,
+        usuario_id: tutor_id
+      }, { transaction }),
+      sequelize.models.tutoriados_tutorias.create({
+        tutoria_id: tutoria.id,
+        usuario_id: tutoriado_id
+      }, { transaction })
     ]);
 
-    console.log('✅ [3] Asociaciones creadas correctamente');
-
-    // 3. Recuperar la tutoría con todas sus relaciones
-    const tutoriaCompleta = await Tutoria.findByPk(tutoria.id, {
-      include: [
-        { 
-          model: Usuario, 
-          as: 'profesor',
-          attributes: ['id', 'nombre']
-        },
-        { 
-          model: Usuario, 
-          as: 'tutores',
-          attributes: ['id', 'nombre']
-        },
-        { 
-          model: Usuario, 
-          as: 'tutoriados',
-          attributes: ['id', 'nombre']
-        }
-      ],
-      transaction
-    });
-
-    console.log('✅ [4] Tutoría recuperada con relaciones:', 
-      JSON.stringify(tutoriaCompleta, null, 2)
-    );
-
     await transaction.commit();
-    console.log('✅ [5] Transacción completada exitosamente');
 
     res.status(201).json({
-      msg: "Tutoría asignada exitosamente",
-      tutoria: tutoriaCompleta
+      msg: 'Tutoría creada y asignada correctamente',
+      tutoria
     });
 
   } catch (error) {
-    await transaction.rollback();
-    console.error('❌ Error detallado al asignar tutor:', {
-      message: error.message,
-      stack: error.stack,
-      originalError: error.original ? {
-        message: error.original.message,
-        detail: error.original.detail,
-        table: error.original.table,
-        constraint: error.original.constraint
-      } : null
-    });
-    
+    if (transaction) await transaction.rollback();
+    console.error('❌ Error en asignarTutoria:', error);
     res.status(500).json({
-      msg: "Error al asignar tutor",
-      error: error.message,
-      details: error.original ? error.original.detail : null
+      msg: 'Error al asignar tutor',
+      error: error.message
     });
   }
 };
@@ -261,34 +244,104 @@ const eliminarTutoria = async (req, res) => {
 const getTutoriasByProfesor = async (req, res) => {
   try {
     const { id } = req.params;
+
     const tutorias = await Tutoria.findAll({
       where: { profesor_id: id },
       include: [
-        { model: Usuario, as: 'tutores', attributes: ['id', 'nombre'] },
-        { model: Usuario, as: 'tutoriados', attributes: ['id', 'nombre'] }
-      ]
+        {
+          model: Usuario,
+          as: 'profesor',
+          attributes: ['id', 'nombre', 'correo']
+        },
+        {
+          model: Usuario,
+          as: 'tutoriasComoTutor',
+          through: { attributes: [] },
+          attributes: ['id', 'nombre']
+        },
+        {
+          model: Usuario,
+          as: 'tutoriasComoTutoriado',
+          through: { attributes: [] },
+          attributes: ['id', 'nombre']
+        }
+      ],
+      order: [['fecha', 'DESC']]
     });
-
-    if (!tutorias.length) {
-      return res.status(404).json({ msg: 'No se encontraron tutorías para este profesor' });
-    }
 
     res.json(tutorias);
   } catch (error) {
-    console.error('Error al obtener tutorías por profesor:', error);
-    res.status(500).json({ msg: 'Error al obtener tutorías del profesor' });
+    console.error('❌ Error al obtener tutorías por profesor:', error);
+    res.status(500).json({
+      msg: 'Error al obtener tutorías del profesor',
+      error: error.message
+    });
   }
 };
 
 
+// Controlador: obtener tutorías por tutor
+const getTutoriasByTutor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log('🔍 Buscando tutorías para el tutor:', id);
+
+    const tutorias = await Tutoria.findAll({
+      include: [
+        { 
+          model: Usuario, 
+          as: 'tutoriasComoTutor',
+          where: { id },
+          attributes: ['id', 'nombre']
+        },
+        {
+          model: Usuario,
+          as: 'tutoriasComoTutoriado',
+          attributes: ['id', 'nombre', 'correo']
+        },
+        {
+          model: Usuario,
+          as: 'profesor',
+          attributes: ['id', 'nombre']
+        }
+      ],
+      attributes: [
+        'id', 'titulo', 'materia', 'descripcion', 
+        'fecha', 'hora_inicio', 'hora_fin', 'estado'
+      ]
+    });
+
+    console.log('✅ Tutorías encontradas:', tutorias.length);
+
+    if (tutorias.length === 0) {
+      return res.status(404).json({
+        msg: 'No se encontraron tutorías para este tutor',
+        debug: { tutorId: id }
+      });
+    }
+
+    res.json(tutorias);
+  } catch (error) {
+    console.error('❌ Error al obtener tutorías del tutor:', {
+      error: error.message,
+      stack: error.stack,
+      tutorId: req.params.id
+    });
+    res.status(500).json({ 
+      msg: 'Error al obtener tutorías',
+      error: error.message 
+    });
+  }
+};
 
 // ✅ Exportar todo el controlador
 module.exports = {
   crearTutoria,
   getTutoriasByRol,
   getCalendarioTutorias,
-  asignarTutor,
+  asignarTutoria,
   actualizarTutoria,
   eliminarTutoria,
-  getTutoriasByProfesor
+  getTutoriasByProfesor,
+  getTutoriasByTutor,
 };

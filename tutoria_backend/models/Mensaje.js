@@ -6,33 +6,33 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    estado: {
-      type: DataTypes.ENUM('enviado', 'leido'),
-      defaultValue: 'enviado'
-    },
-    emisorId: {
+    emisor_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Usuarios',
+        model: 'usuarios',
         key: 'id'
       }
     },
-    receptorId: {
+    receptor_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'Usuarios',
+        model: 'usuarios',
         key: 'id'
       }
     },
-    tutoriaId: {
+    tutoria_id: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       references: {
-        model: 'Tutorias',
+        model: 'tutorias',
         key: 'id'
       }
+    },
+    leido: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     tableName: 'mensajes',
@@ -40,25 +40,19 @@ module.exports = (sequelize, DataTypes) => {
     underscored: true
   });
 
-  Mensaje.associate = function(models) {
-    // Corregimos las asociaciones asegurándonos de que los modelos existan
-    if (models.Usuario) {
-      Mensaje.belongsTo(models.Usuario, {
-        as: 'emisor',
-        foreignKey: 'emisorId'
-      });
-      
-      Mensaje.belongsTo(models.Usuario, {
-        as: 'receptor',
-        foreignKey: 'receptorId'
-      });
-    }
-
-    if (models.Tutoria) {
-      Mensaje.belongsTo(models.Tutoria, {
-        foreignKey: 'tutoriaId'
-      });
-    }
+  Mensaje.associate = (models) => {
+    Mensaje.belongsTo(models.Usuario, {
+      as: 'emisor',
+      foreignKey: 'emisor_id'
+    });
+    Mensaje.belongsTo(models.Usuario, {
+      as: 'receptor',
+      foreignKey: 'receptor_id'
+    });
+    Mensaje.belongsTo(models.Tutoria, {
+      as: 'tutoria',
+      foreignKey: 'tutoria_id'
+    });
   };
 
   return Mensaje;
