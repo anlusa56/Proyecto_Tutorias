@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, Routes, Route, Navigate } from "react-router-dom";
 import '../styles/MenuCommon.css';
 import './ProfesorMenu.css';
+import Chat from './Chat';
+
 
 function AsignarTutorias({ onAsignar }) {
   const [formData, setFormData] = useState({
@@ -205,7 +207,9 @@ function SeguimientoTutorias({ usuario }) {
   const [tutorias, setTutorias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [tutoriaSeleccionada, setTutoriaSeleccionada] = useState(null);
 
+  // ✅ Cargar tutorías del profesor
   useEffect(() => {
     const cargarTutorias = async () => {
       try {
@@ -228,12 +232,34 @@ function SeguimientoTutorias({ usuario }) {
     cargarTutorias();
   }, [usuario.id]);
 
+  // ✅ Eliminar tutoría
+  const eliminarTutoria = async (id) => {
+    if (!window.confirm("¿Seguro que deseas eliminar esta tutoría?")) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:4000/api/tutorias/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || "Error al eliminar tutoría");
+
+      alert("🗑️ Tutoría eliminada correctamente");
+      setTutorias(prev => prev.filter(t => t.id !== id));
+    } catch (err) {
+      console.error("❌ Error al eliminar tutoría:", err);
+      alert("Error al eliminar tutoría");
+    }
+  };
+
   if (loading) return <div className="loading">Cargando tutorías...</div>;
   if (error) return <div className="error-message">{error}</div>;
 
   return (
     <div className="section-container">
-      <h2>Seguimiento de Tutorías</h2>
+      <h2>Seguimiento de Tutorías Asignadas</h2>
       <div className="tutorias-grid">
         {tutorias.map(tutoria => (
           <div key={tutoria.id} className="tutoria-card">
@@ -251,12 +277,44 @@ function SeguimientoTutorias({ usuario }) {
                 <p><strong>Observaciones:</strong> {tutoria.observaciones}</p>
               )}
             </div>
+
+            <div className="acciones-profesor">
+              {/* 👀 Ver Chat */}
+              <button
+                className="ver-chat-button"
+                onClick={() =>
+                  setTutoriaSeleccionada(
+                    tutoriaSeleccionada?.id === tutoria.id ? null : tutoria
+                  )
+                }
+              >
+                {tutoriaSeleccionada?.id === tutoria.id
+                  ? "Cerrar Chat"
+                  : "Ver Chat"}
+              </button>
+
+              {/* 🗑️ Eliminar */}
+              <button
+                className="eliminar-button"
+                onClick={() => eliminarTutoria(tutoria.id)}
+              >
+                Eliminar
+              </button>
+            </div>
+
+            {/* 💬 Chat visible */}
+            {tutoriaSeleccionada?.id === tutoria.id && (
+              <div className="chat-visor">
+                <Chat tutoria={tutoria} usuario={usuario} />
+              </div>
+            )}
           </div>
         ))}
       </div>
     </div>
   );
 }
+
 
 
 function Reportes() {

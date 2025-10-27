@@ -284,55 +284,158 @@ const getTutoriasByProfesor = async (req, res) => {
 const getTutoriasByTutor = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('🔍 Buscando tutorías para el tutor:', id);
+    console.log("🔍 Buscando tutorías para el tutor:", id);
 
-    const tutorias = await Tutoria.findAll({
+    const tutorias = await db.Tutoria.findAll({
       include: [
-        { 
-          model: Usuario, 
-          as: 'tutoriasComoTutor',
+        {
+          model: db.Usuario,
+          as: "tutoriasComoTutor", // 👈 alias exacto del modelo Tutoria
           where: { id },
-          attributes: ['id', 'nombre']
+          attributes: ["id", "nombre", "correo"],
+          through: { attributes: [] },
+          required: true
         },
         {
-          model: Usuario,
-          as: 'tutoriasComoTutoriado',
-          attributes: ['id', 'nombre', 'correo']
+          model: db.Usuario,
+          as: "tutoriasComoTutoriado", // 👈 alias exacto del modelo Tutoria
+          attributes: ["id", "nombre", "correo"],
+          through: { attributes: [] },
+          required: false
         },
         {
-          model: Usuario,
-          as: 'profesor',
-          attributes: ['id', 'nombre']
+          model: db.Usuario,
+          as: "profesor",
+          attributes: ["id", "nombre", "correo"],
+          required: false
         }
       ],
       attributes: [
-        'id', 'titulo', 'materia', 'descripcion', 
-        'fecha', 'hora_inicio', 'hora_fin', 'estado'
+        "id",
+        "titulo",
+        "materia",
+        "fecha",
+        "hora_inicio",
+        "hora_fin",
+        "estado"
       ]
     });
 
-    console.log('✅ Tutorías encontradas:', tutorias.length);
-
-    if (tutorias.length === 0) {
-      return res.status(404).json({
-        msg: 'No se encontraron tutorías para este tutor',
-        debug: { tutorId: id }
-      });
-    }
-
+    console.log("✅ Tutorías encontradas:", tutorias.length);
     res.json(tutorias);
   } catch (error) {
-    console.error('❌ Error al obtener tutorías del tutor:', {
+    console.error("❌ Error al obtener tutorías del tutor:", {
       error: error.message,
       stack: error.stack,
       tutorId: req.params.id
     });
-    res.status(500).json({ 
-      msg: 'Error al obtener tutorías',
-      error: error.message 
+    res.status(500).json({ error: error.message });
+  }
+};
+// Controlador: obtener tutorías por tutoriado
+const getTutoriasByTutoriado = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("🔍 Buscando tutorías para el tutoriado:", id);
+
+    const tutorias = await db.Tutoria.findAll({
+      include: [
+        {
+          model: db.Usuario,
+          as: "tutoriasComoTutoriado", // alias exacto definido en Tutoria.js
+          where: { id },
+          attributes: ["id", "nombre", "correo"],
+          through: { attributes: [] },
+          required: true
+        },
+        {
+          model: db.Usuario,
+          as: "tutoriasComoTutor", // alias del tutor
+          attributes: ["id", "nombre", "correo"],
+          through: { attributes: [] },
+          required: false
+        },
+        {
+          model: db.Usuario,
+          as: "profesor",
+          attributes: ["id", "nombre", "correo"],
+          required: false
+        }
+      ],
+      attributes: [
+        "id",
+        "titulo",
+        "materia",
+        "fecha",
+        "hora_inicio",
+        "hora_fin",
+        "estado"
+      ],
+      order: [["fecha", "DESC"]]
+    });
+
+    console.log("✅ Tutorías encontradas:", tutorias.length);
+    res.json(tutorias);
+  } catch (error) {
+    console.error("❌ Error al obtener tutorías del tutoriado:", {
+      error: error.message,
+      stack: error.stack,
+      tutoriadoId: req.params.id
+    });
+    res.status(500).json({ error: error.message });
+  }
+};
+// ✅ Cambiar solo el estado de una tutoría
+const actualizarEstadoTutoria = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+
+    const tutoria = await Tutoria.findByPk(id);
+    if (!tutoria) return res.status(404).json({ msg: "Tutoría no encontrada" });
+
+    await tutoria.update({ estado });
+
+    res.json({ msg: `Estado actualizado a '${estado}' correctamente`, tutoria });
+  } catch (error) {
+    console.error("❌ Error al actualizar estado:", error);
+    res.status(500).json({ msg: "Error al actualizar estado", error: error.message });
+  }
+};
+// ✅ Cambiar estado de una tutoría
+const updateTutoriaEstado = async (req, res) => {
+  try {
+    const { id } = req.params; // ID de la tutoría
+    const { estado } = req.body; // Nuevo estado enviado desde el frontend
+
+    // Validar que el campo 'estado' exista
+    if (!estado) {
+      return res.status(400).json({ msg: "El campo 'estado' es obligatorio" });
+    }
+
+    // Buscar la tutoría en la base de datos
+    const tutoria = await Tutoria.findByPk(id);
+    if (!tutoria) {
+      return res.status(404).json({ msg: "Tutoría no encontrada" });
+    }
+
+    // Actualizar el estado
+    tutoria.estado = estado;
+    await tutoria.save();
+
+    return res.json({
+      msg: "Estado actualizado correctamente",
+      tutoria,
+    });
+  } catch (error) {
+    console.error("❌ Error al actualizar estado de tutoría:", error);
+    return res.status(500).json({
+      msg: "Error al actualizar el estado de la tutoría",
+      error: error.message,
     });
   }
 };
+
 
 // ✅ Exportar todo el controlador
 module.exports = {
@@ -344,4 +447,7 @@ module.exports = {
   eliminarTutoria,
   getTutoriasByProfesor,
   getTutoriasByTutor,
+  getTutoriasByTutoriado,
+  actualizarEstadoTutoria,
+  updateTutoriaEstado,
 };

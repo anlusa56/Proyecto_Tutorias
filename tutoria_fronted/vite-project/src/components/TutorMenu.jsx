@@ -26,6 +26,12 @@ export default function TutorMenu({ usuario, onLogout }) {
         const dataTutorias = await resTutorias.json();
         if (!resTutorias.ok) throw new Error(dataTutorias.msg || 'Error al cargar tutorías');
         setTutorias(dataTutorias);
+        console.log("📦 Tutorías recibidas:", dataTutorias);
+        console.log("Ejemplo de una tutoria:", JSON.stringify(dataTutorias[0], null, 2));
+
+
+
+
 
         // Cargar tutoriados
         const resTutoriados = await fetch(`http://localhost:4000/api/tutoriados/tutor/${usuario.id}`, {
@@ -44,6 +50,8 @@ export default function TutorMenu({ usuario, onLogout }) {
         } else {
           setTutoriados(dataTutoriados);
         }
+        console.log("📦 Tutoriados recibidos:", dataTutoriados);
+
 
       } catch (err) {
         console.error('Error:', err);
@@ -52,6 +60,7 @@ export default function TutorMenu({ usuario, onLogout }) {
         setLoading(false);
       }
     };
+
 
     cargarDatos();
   }, [usuario.id]);
@@ -102,25 +111,91 @@ export default function TutorMenu({ usuario, onLogout }) {
 function MisTutorias({ tutorias, error, usuario }) {
   const [tutoriaSeleccionada, setTutoriaSeleccionada] = useState(null);
 
+  // ✅ Función para actualizar el estado de la tutoría
+  const cambiarEstadoTutoria = async (tutoria, nuevoEstado) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // 🔥 Se usa la ruta correcta del backend
+      const res = await fetch(`http://localhost:4000/api/tutorias/${tutoria.id}/estado`, {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ estado: nuevoEstado }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || "Error al actualizar estado");
+
+      alert(`📘 Tutoría marcada como ${nuevoEstado}`);
+
+      // ✅ Actualiza el estado local sin recargar
+      setTutorias((prev) =>
+        prev.map((t) =>
+          t.id === tutoria.id ? { ...t, estado: nuevoEstado } : t
+        )
+      );
+    } catch (err) {
+      console.error("❌ Error al cambiar estado:", err);
+      alert("Error al actualizar estado");
+    }
+  };
+
   return (
     <div className="tutorias-list">
       <h2>Mis Tutorías como Tutor</h2>
       {error && <p className="error-message">{error}</p>}
-      
+
       {tutorias?.length > 0 ? (
         <div className="tutorias-grid">
-          {tutorias.map(tutoria => (
+          {tutorias.map((tutoria) => (
             <div key={tutoria.id} className="tutoria-card">
               <h3>{tutoria.materia}</h3>
-              <p>Fecha: {new Date(tutoria.fecha).toLocaleString()}</p>
-              <p>Estado: {tutoria.estado}</p>
-              <p>Estudiantes: {tutoria.tutoriados?.length || 0}</p>
-              <button 
-                onClick={() => setTutoriaSeleccionada(tutoriaSeleccionada?.id === tutoria.id ? null : tutoria)}
-                className="chat-button"
-              >
-                {tutoriaSeleccionada?.id === tutoria.id ? 'Cerrar Chat' : 'Abrir Chat'}
-              </button>
+              <p>Fecha: {new Date(tutoria.fecha).toLocaleDateString()}</p>
+              <p>Estado actual: <strong>{tutoria.estado}</strong></p>
+              <p>
+                Estudiante:{" "}
+                {tutoria.tutoriasComoTutoriado?.[0]?.nombre || "Sin asignar"}
+              </p>
+
+              {/* ✅ Botones de acciones */}
+              <div className="acciones-tutoria">
+                {/* 🔄 Cambiar estado */}
+                {tutoria.estado === "programada" && (
+                  <button
+                    className="estado-button iniciar"
+                    onClick={() => cambiarEstadoTutoria(tutoria, "en curso")}
+                  >
+                    Iniciar Tutoría
+                  </button>
+                )}
+                {tutoria.estado === "en curso" && (
+                  <button
+                    className="estado-button finalizar"
+                    onClick={() => cambiarEstadoTutoria(tutoria, "completada")}
+                  >
+                    Finalizar Tutoría
+                  </button>
+                )}
+
+                {/* 💬 Chat */}
+                <button
+                  onClick={() =>
+                    setTutoriaSeleccionada(
+                      tutoriaSeleccionada?.id === tutoria.id ? null : tutoria
+                    )
+                  }
+                  className="chat-button"
+                >
+                  {tutoriaSeleccionada?.id === tutoria.id
+                    ? "Cerrar Chat"
+                    : "Ver Chat"}
+                </button>
+              </div>
+
+              {/* 🗨️ Chat */}
               {tutoriaSeleccionada?.id === tutoria.id && (
                 <Chat tutoria={tutoria} usuario={usuario} />
               )}
@@ -134,21 +209,63 @@ function MisTutorias({ tutorias, error, usuario }) {
   );
 }
 
+
 function MisTutoriados({ tutoriados, error }) {
+  const [avances, setAvances] = useState([]);
+  const [tutoriadoSeleccionado, setTutoriadoSeleccionado] = useState(null);
+
+  const cargarAvances = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:4000/api/avances/tutoriado/${id}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setAvances(data);
+      setTutoriadoSeleccionado(id);
+    } catch (err) {
+      console.error("Error cargando avances:", err);
+    }
+  };
+
   return (
     <div className="tutoriados-list">
       <h2>Mis Estudiantes Asignados</h2>
       {error && <p className="error-message">{error}</p>}
-      
+
       {tutoriados?.length > 0 ? (
         <div className="tutoriados-grid">
-          {tutoriados.map(tutoriado => (
-            <div key={tutoriado.id} className="tutoriado-card">
-              <h3>{tutoriado.nombre}</h3>
-              <p>Email: {tutoriado.correo}</p>
-              <p>Progreso: {tutoriado.progreso || 'Sin registros'}</p>
-            </div>
-          ))}
+          {tutoriados.map(tutoria => {
+            const estudiante = tutoria.tutoriados?.[0];
+            return (
+              <div key={tutoria.id} className="tutoriado-card">
+                <h3>{estudiante?.nombre || "Sin estudiante"}</h3>
+                <p>Email: {estudiante?.correo || "Sin correo"}</p>
+
+                <button onClick={() => cargarAvances(estudiante?.id)}>
+                  Ver avances
+                </button>
+
+                {tutoriadoSeleccionado === estudiante?.id && (
+                  <div className="avances-list">
+                    <h4>Avances registrados:</h4>
+                    {avances.length > 0 ? (
+                      <ul>
+                        {avances.map(av => (
+                          <li key={av.id}>
+                            <strong>{av.tema}</strong> ({av.fecha}): {av.descripcion}  
+                            — Calificación: {av.calificacion}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No hay avances registrados.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       ) : (
         <p>No tienes estudiantes asignados</p>
@@ -178,14 +295,14 @@ function RegistrarAvances({ tutoriados }) {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:4000/api/avances', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
+      const res = await fetch(`http://localhost:4000/api/tutorias/${tutoria.id}/estado`, {
+  method: "PUT",
+  headers: {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ estado: nuevoEstado }),
+});
 
       if (!res.ok) {
         const data = await res.json();
@@ -223,9 +340,9 @@ function RegistrarAvances({ tutoriados }) {
             required
           >
             <option value="">Seleccionar estudiante</option>
-            {tutoriados.map(tutoriado => (
-              <option key={tutoriado.id} value={tutoriado.id}>
-                {tutoriado.nombre}
+            {tutoriados.map(tutoria => (
+              <option key={tutoria.id} value={tutoria.tutoriados?.[0]?.id}>
+                {tutoria.tutoriados?.[0]?.nombre}
               </option>
             ))}
           </select>

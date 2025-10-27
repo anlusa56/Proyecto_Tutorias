@@ -26,14 +26,18 @@ const getMensajesByTutoria = async (req, res) => {
 // Enviar un mensaje
 const enviarMensaje = async (req, res) => {
   try {
-    const { tutoriaId, receptorId, contenido } = req.body;
-    const emisorId = req.usuario.id;
+    // 👇 Aquí el cambio importante
+    const { contenido, tutoria_id, receptor_id, emisor_id } = req.body;
+
+    if (!contenido || !tutoria_id || !receptor_id || !emisor_id) {
+      return res.status(400).json({ msg: 'Faltan datos obligatorios' });
+    }
 
     const mensaje = await Mensaje.create({
       contenido,
-      emisor_id: emisorId,
-      receptor_id: receptorId,
-      tutoria_id: tutoriaId,
+      tutoria_id,
+      emisor_id,
+      receptor_id,
       leido: false
     });
 
@@ -53,6 +57,7 @@ const enviarMensaje = async (req, res) => {
     });
   }
 };
+
 
 // Marcar mensajes como leídos
 const marcarComoLeido = async (req, res) => {

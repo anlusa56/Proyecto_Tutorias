@@ -54,12 +54,10 @@ function AppRoutes({ usuario, setUsuario }) {
   if (usuario?.rol === ROLES.TUTORIADO) {
     return (
       <Routes>
-        <Route path="/estudiante_tutoriado" element={<EstudianteTutoriadoLayout setUsuario={setUsuario} />}>
-          <Route index element={<EstudianteTutoriadoHome />} />
-          <Route path="tutorias" element={<TutoriasList />} />
-          <Route path="calendario" element={<CalendarioTutorias />} />
-          <Route path="materiales" element={<Materiales />} />
-        </Route>
+        <Route
+          path="/estudiante_tutoriado/*"
+          element={<TutoriadoMenu usuario={usuario} onLogout={handleLogout} />}
+        />
         <Route path="*" element={<Navigate to="/estudiante_tutoriado" replace />} />
       </Routes>
     );

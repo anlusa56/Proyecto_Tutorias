@@ -118,3 +118,41 @@
     grid-template-columns: 1fr;
   }
 }
+.acciones-profesor {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.ver-chat-button {
+  background-color: #2980b9;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.ver-chat-button:hover {
+  background-color: #1f6392;
+}
+
+.eliminar-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.eliminar-button:hover {
+  background-color: #c0392b;
+}
+
+.chat-visor {
+  margin-top: 10px;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+}
