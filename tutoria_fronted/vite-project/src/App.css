@@ -1,11 +1,12 @@
+/* --- Estilos base del proyecto --- */
 #root {
-  width: 100%;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-  color: #fff;
+  background-color: #f4f6f9;
+  color: #333;
 }
 
 .logo {
@@ -15,10 +16,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #b0b1ceaa);
+  filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #161718aa);
+  filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
 @keyframes logo-spin {
@@ -36,8 +37,6 @@
   }
 }
 
-<<<<<<< HEAD
-=======
 .card {
   padding: 2em;
   background: white;
@@ -94,7 +93,6 @@
   background: #4a54e1;
 }
 
->>>>>>> ed10def774c778d1fd4c95a6f9b3706c0f0d601b
 /* --- Contenedor especial para UsersPage --- */
 .users-page-container {
   display: flex;
@@ -107,37 +105,33 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+  background-color: #1a1a1a;
 }
 
 .menu-container {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background-color: #1a1a1a;
 }
 
 .menu-content {
   flex: 1;
   padding: 20px;
-  background-color: transparent !important;
+  background-color: #242424;
+  color: #fff;
 }
 
 .error-message {
-  color: #ff6b6b;
-  background-color: rgba(255, 107, 107, 0.1);
+  color: #dc3545;
+  background-color: #f8d7da;
   padding: 10px;
   border-radius: 4px;
-  border: 1px solid #ff6b6b;
   margin: 10px 0;
 }
 
 .loading-message {
   text-align: center;
   padding: 20px;
-  color: #FFD700;
-}
-
-/* Eliminar TODOS los estilos anteriores del panel */
-.panel-container, .panel, .card {
-  display: none !important;
+  color: #666;
 }
