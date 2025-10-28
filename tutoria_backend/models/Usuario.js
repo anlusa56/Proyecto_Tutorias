@@ -61,6 +61,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    estado_registro: {
+      type: DataTypes.ENUM('pendiente', 'aprobado', 'rechazado'),
+      defaultValue: 'pendiente'
+    }
   }, {
     sequelize,
     modelName: 'Usuario',

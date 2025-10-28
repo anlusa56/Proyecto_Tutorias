@@ -234,23 +234,30 @@ function SeguimientoTutorias({ usuario }) {
 
   // ✅ Eliminar tutoría
   const eliminarTutoria = async (id) => {
-    if (!window.confirm("¿Seguro que deseas eliminar esta tutoría?")) return;
+    if (!window.confirm("¿Seguro que deseas eliminar esta tutoría? Se eliminarán también todos los mensajes asociados.")) return;
 
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(`http://localhost:4000/api/tutorias/${id}`, {
         method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` }
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || "Error al eliminar tutoría");
+      
+      if (!res.ok) {
+        console.error('Error al eliminar:', data);
+        throw new Error(data.msg || "Error al eliminar tutoría");
+      }
 
-      alert("🗑️ Tutoría eliminada correctamente");
+      alert("✅ Tutoría eliminada correctamente");
       setTutorias(prev => prev.filter(t => t.id !== id));
     } catch (err) {
       console.error("❌ Error al eliminar tutoría:", err);
-      alert("Error al eliminar tutoría");
+      alert(`Error al eliminar tutoría: ${err.message}`);
     }
   };
 

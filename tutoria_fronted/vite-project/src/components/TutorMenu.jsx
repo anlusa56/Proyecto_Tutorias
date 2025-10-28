@@ -98,7 +98,7 @@ export default function TutorMenu({ usuario, onLogout }) {
       <div className="menu-content">
         <Routes>
           <Route path="/" element={<Navigate to="tutorias" replace />} />
-          <Route path="tutorias" element={<MisTutorias tutorias={tutorias} error={error} usuario={usuario} />} />
+          <Route path="tutorias" element={<MisTutorias tutorias={tutorias} error={error} usuario={usuario} setTutorias={setTutorias} />} />
           <Route path="tutoriados" element={<MisTutoriados tutoriados={tutoriados} error={error} />} />
           <Route path="avances" element={<RegistrarAvances tutoriados={tutoriados} />} />
           <Route path="*" element={<Navigate to="/estudiante_tutor/tutorias" replace />} />
@@ -108,38 +108,42 @@ export default function TutorMenu({ usuario, onLogout }) {
   );
 }
 
-function MisTutorias({ tutorias, error, usuario }) {
+function MisTutorias({ tutorias, error, usuario, setTutorias }) {
   const [tutoriaSeleccionada, setTutoriaSeleccionada] = useState(null);
 
-  // ✅ Función para actualizar el estado de la tutoría
   const cambiarEstadoTutoria = async (tutoria, nuevoEstado) => {
     try {
+      // Convertir espacios a guiones bajos para el estado
+      const estadoFormateado = nuevoEstado.replace(' ', '_');
+      
       const token = localStorage.getItem("token");
-
-      // 🔥 Se usa la ruta correcta del backend
       const res = await fetch(`http://localhost:4000/api/tutorias/${tutoria.id}/estado`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ estado: nuevoEstado }),
+        body: JSON.stringify({ estado: estadoFormateado }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || "Error al actualizar estado");
+      
+      if (!res.ok) {
+        console.error('Error response:', data);
+        throw new Error(data.msg || "Error al actualizar estado");
+      }
 
-      alert(`📘 Tutoría marcada como ${nuevoEstado}`);
-
-      // ✅ Actualiza el estado local sin recargar
-      setTutorias((prev) =>
-        prev.map((t) =>
-          t.id === tutoria.id ? { ...t, estado: nuevoEstado } : t
+      // Actualizar el estado local con la tutoría actualizada del servidor
+      setTutorias(prevTutorias => 
+        prevTutorias.map(t => 
+          t.id === tutoria.id ? { ...t, estado: estadoFormateado } : t
         )
       );
+
+      alert(`✅ Tutoría marcada como ${nuevoEstado}`);
     } catch (err) {
       console.error("❌ Error al cambiar estado:", err);
-      alert("Error al actualizar estado");
+      alert(`Error al actualizar estado: ${err.message}`);
     }
   };
 
@@ -166,12 +170,12 @@ function MisTutorias({ tutorias, error, usuario }) {
                 {tutoria.estado === "programada" && (
                   <button
                     className="estado-button iniciar"
-                    onClick={() => cambiarEstadoTutoria(tutoria, "en curso")}
+                    onClick={() => cambiarEstadoTutoria(tutoria, "en_curso")}
                   >
                     Iniciar Tutoría
                   </button>
                 )}
-                {tutoria.estado === "en curso" && (
+                {tutoria.estado === "en_curso" && (
                   <button
                     className="estado-button finalizar"
                     onClick={() => cambiarEstadoTutoria(tutoria, "completada")}

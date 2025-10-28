@@ -3,6 +3,7 @@ import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import UsersPage from '../pages/UsersPage';
 import TutoriasPage from '../pages/TutoriasPage';
 import ReportesPage from '../pages/ReportesPage';
+import SolicitudesRegistro from '../pages/SolicitudesRegistro';
 import '../styles/MenuCommon.css';
 import './AdminMenu.css';
 
@@ -403,6 +404,7 @@ export default function AdminMenu({ usuario, onLogout }) {
     <div className="menu-container">
       <nav className="menu-nav">
         <ul>
+          <li><Link to="/admin/solicitudes">Solicitudes de Registro</Link></li>
           <li><Link to="/admin/usuarios">Gestión de Usuarios</Link></li>
           <li><Link to="/admin/configuracion">Configuración</Link></li>
           <li>
@@ -415,7 +417,8 @@ export default function AdminMenu({ usuario, onLogout }) {
 
       <div className="menu-content">
         <Routes>
-          <Route path="/" element={<Navigate to="/admin/usuarios" replace />} />
+          <Route path="/" element={<Navigate to="/admin/solicitudes" replace />} />
+          <Route path="/solicitudes" element={<SolicitudesRegistro />} />
           <Route path="/usuarios" element={<GestionUsuarios />} />
           <Route path="/configuracion" element={<ConfiguracionSistema />} />
         </Routes>

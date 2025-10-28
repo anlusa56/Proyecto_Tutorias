@@ -227,17 +227,49 @@ const actualizarTutoria = async (req, res) => {
 
 // ✅ Eliminar tutoría
 const eliminarTutoria = async (req, res) => {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { id } = req.params;
+    
+    console.log('🗑️ Intentando eliminar tutoría:', id);
+
+    // 1. Primero eliminar los mensajes asociados
+    await sequelize.models.Mensaje.destroy({
+      where: { tutoria_id: id },
+      transaction
+    });
+
+    // 2. Eliminar registros de las tablas intermedias
+    await sequelize.models.tutores_tutorias.destroy({
+      where: { tutoria_id: id },
+      transaction
+    });
+
+    await sequelize.models.tutoriados_tutorias.destroy({
+      where: { tutoria_id: id },
+      transaction
+    });
+
+    // 3. Finalmente eliminar la tutoría
     const tutoria = await Tutoria.findByPk(id);
+    if (!tutoria) {
+      await transaction.rollback();
+      return res.status(404).json({ msg: "Tutoría no encontrada" });
+    }
 
-    if (!tutoria) return res.status(404).json({ msg: "Tutoría no encontrada" });
+    await tutoria.destroy({ transaction });
+    await transaction.commit();
 
-    await tutoria.destroy();
+    console.log('✅ Tutoría y registros relacionados eliminados correctamente');
     res.json({ msg: "Tutoría eliminada correctamente" });
   } catch (error) {
+    if (transaction) await transaction.rollback();
     console.error('❌ Error al eliminar tutoría:', error);
-    res.status(500).json({ msg: "Error al eliminar tutoría", error: error.message });
+    res.status(500).json({ 
+      msg: "Error al eliminar tutoría", 
+      error: error.message 
+    });
   }
 };
 // Controlador: obtener tutorías por profesor
@@ -391,15 +423,56 @@ const actualizarEstadoTutoria = async (req, res) => {
     const { id } = req.params;
     const { estado } = req.body;
 
+    console.log('📝 Actualizando estado de tutoría:', { id, estado });
+
     const tutoria = await Tutoria.findByPk(id);
-    if (!tutoria) return res.status(404).json({ msg: "Tutoría no encontrada" });
+    
+    if (!tutoria) {
+      console.log('❌ Tutoría no encontrada:', id);
+      return res.status(404).json({ msg: "Tutoría no encontrada" });
+    }
+
+    // Validar estado permitido
+    const estadosPermitidos = ['programada', 'en_curso', 'completada', 'cancelada'];
+    if (!estadosPermitidos.includes(estado)) {
+      return res.status(400).json({ 
+        msg: "Estado no válido",
+        estadosPermitidos 
+      });
+    }
 
     await tutoria.update({ estado });
+    
+    // Obtener la tutoría actualizada con sus relaciones
+    const tutoriaActualizada = await Tutoria.findByPk(id, {
+      include: [
+        {
+          model: Usuario,
+          as: 'tutoriasComoTutor',
+          attributes: ['id', 'nombre'],
+          through: { attributes: [] }
+        },
+        {
+          model: Usuario,
+          as: 'tutoriasComoTutoriado',
+          attributes: ['id', 'nombre'],
+          through: { attributes: [] }
+        }
+      ]
+    });
 
-    res.json({ msg: `Estado actualizado a '${estado}' correctamente`, tutoria });
+    console.log('✅ Estado actualizado correctamente:', estado);
+
+    res.json({ 
+      msg: `Estado actualizado a '${estado}' correctamente`, 
+      tutoria: tutoriaActualizada 
+    });
   } catch (error) {
     console.error("❌ Error al actualizar estado:", error);
-    res.status(500).json({ msg: "Error al actualizar estado", error: error.message });
+    res.status(500).json({ 
+      msg: "Error al actualizar estado", 
+      error: error.message 
+    });
   }
 };
 // ✅ Cambiar estado de una tutoría

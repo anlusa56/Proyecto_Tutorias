@@ -70,7 +70,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     },
     estado: {
-      type: DataTypes.ENUM('programada', 'completada', 'cancelada'),
+      type: DataTypes.ENUM('programada', 'en_curso', 'completada', 'cancelada'),
       defaultValue: 'programada'
     },
     profesor_id: {

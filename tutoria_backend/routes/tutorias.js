@@ -32,7 +32,6 @@ router.get('/tutoriado/:id', getTutoriasByTutoriado);
 router.put('/:id', actualizarTutoria);
 router.delete('/:id', eliminarTutoria);
 router.put('/:id/estado', actualizarEstadoTutoria);
-router.put('/:id/estado',  updateTutoriaEstado);
 
 
 

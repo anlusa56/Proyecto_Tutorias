@@ -1,10 +1,12 @@
 .asignar-form {
   max-width: 600px;
   margin: 0 auto;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 2rem;
+  background: #2a2a2a;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  border: 1px solid #FFD700;
+  color: #fff;
 }
 
 .form-group {
@@ -13,19 +15,27 @@
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
-  color: #333;
-  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #FFD700;
+  font-weight: 600;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 0.8rem;
+  border: 1px solid #FFD700;
+  color: #fff;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.3);
 }
 
 .form-group textarea {
@@ -87,13 +97,21 @@
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stats-card {
+  background: #2a2a2a;
+  border: 1px solid #FFD700;
+  border-radius: 12px;
+  padding: 1.5rem;
   text-align: center;
 }
 
-.stat-number {
-  font-size: 24px;
-  font-weight: bold;
-  color: #2196f3;
+.stats-number {
+  color: #FFD700;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 1rem 0;
 }
 
 .materias-grid {
@@ -123,6 +141,22 @@
   justify-content: space-between;
   margin-top: 10px;
   gap: 8px;
+}
+
+.acciones-profesor button {
+  background-color: #FFD700;
+  color: #000;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.acciones-profesor button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
 .ver-chat-button {
