@@ -289,6 +289,7 @@ function ConfiguracionSistema() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
+  const [toast, setToast] = useState('');
 
   useEffect(() => {
     const cargarConfig = async () => {
@@ -313,6 +314,18 @@ function ConfiguracionSistema() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar duración de la tutoría
+    if (config.duracionTutoria < 30) {
+      setToast('Una tutoría no puede durar menos de 30 minutos');
+      return;
+    }
+
+    if (config.duracionTutoria >= 120) {
+      setToast('Una tutoría no puede durar 2 horas o más');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const res = await fetch('http://localhost:4000/api/configuracion', {
@@ -332,6 +345,14 @@ function ConfiguracionSistema() {
     }
   };
 
+  // Efecto para limpiar el toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   if (loading) return <div className="loading">Cargando configuración...</div>;
 
   return (
@@ -339,6 +360,7 @@ function ConfiguracionSistema() {
       <h2>Configuración del Sistema</h2>
       {error && <div className="error-message">{error}</div>}
       {saved && <div className="success-message">Configuración guardada exitosamente</div>}
+      {toast && <div className="toast-message">{toast}</div>}
 
       <form onSubmit={handleSubmit} className="config-form">
         <div className="form-group">
@@ -348,7 +370,7 @@ function ConfiguracionSistema() {
             value={config.duracionTutoria}
             onChange={(e) => setConfig({...config, duracionTutoria: parseInt(e.target.value)})}
             min="30"
-            max="180"
+            max="119"
             required
           />
         </div>

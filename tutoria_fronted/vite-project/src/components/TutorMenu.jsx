@@ -299,17 +299,18 @@ function RegistrarAvances({ tutoriados }) {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:4000/api/tutorias/${tutoria.id}/estado`, {
-  method: "PUT",
-  headers: {
-    "Authorization": `Bearer ${token}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ estado: nuevoEstado }),
-});
+      const res = await fetch('http://localhost:4000/api/avances', {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
+      const data = await res.json();
+      
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.msg || 'Error al registrar avance');
       }
 

@@ -18,11 +18,11 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #232429;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #000000;
 }
 
 /* Eliminar el display: flex y place-items del body que causa problemas */
@@ -49,7 +49,7 @@ button {
 }
 
 button:hover {
-  border-color: #646cff;
+  border-color: #000000;
   transform: translateY(-2px);
 }
 button:focus,
@@ -68,13 +68,13 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: #0e0b0b;
   }
   a:hover {
-    color: #747bff;
+    color: #05050e;
   }
   button {
-    background-color: #f9f9f9;
-    color: #213547;
+    background-color: #1a1818;
+    color: #000000;
   }
 }
