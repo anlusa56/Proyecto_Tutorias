@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Home from "./pages/Home";
 import Login from "./components/Login";
 import Registro from "./pages/Registro";
-import AdminMenu from "./components/AdminMenu";
 import ProfesorMenu from "./components/ProfesorMenu";
+import AdminMenu from "./components/AdminMenu";
 import TutorMenu from "./components/TutorMenu";
 import TutoriadoMenu from "./components/TutoriadoMenu";
 import EstudianteTutoriadoLayout from "./components/EstudianteTutoriadoLayout";
