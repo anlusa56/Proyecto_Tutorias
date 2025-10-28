@@ -1,0 +1,194 @@
+[1mdiff --git a/tutoria_backend/app.js b/tutoria_backend/app.js[m
+[1mindex 7fea941..0814474 100644[m
+[1m--- a/tutoria_backend/app.js[m
+[1m+++ b/tutoria_backend/app.js[m
+[36m@@ -19,6 +19,8 @@[m [mapp.use("/api/tutorias", require("./routes/tutorias"));[m
+ app.use("/api/mensajes", require("./routes/mensajes"));[m
+ app.use("/api/configuracion", require("./routes/configuracion.routes"));[m
+ app.use('/api/reportes', require('./routes/reporte.routes'));[m
+[32m+[m[32mapp.use('/api/tutoriados', require('./routes/tutoriadosRoutes'));[m
+[32m+[m[32mapp.use('/api/avances', require('./routes/avances'));[m
+ [m
+ const PORT = process.env.PORT || 4000;[m
+ [m
+[1mdiff --git a/tutoria_backend/controllers/mensajeController.js b/tutoria_backend/controllers/mensajeController.js[m
+[1mindex d8d4ca7..6559a78 100644[m
+[1m--- a/tutoria_backend/controllers/mensajeController.js[m
+[1m+++ b/tutoria_backend/controllers/mensajeController.js[m
+[36m@@ -1,101 +1,82 @@[m
+[31m-const Mensaje = require('../models/Mensaje');[m
+[31m-const Usuario = require('../models/Usuario');[m
+[32m+[m[32mconst { Mensaje, Usuario } = require('../models');[m
+ [m
+[31m-const enviarMensaje = async (req, res) => {[m
+[32m+[m[32m// Obtener mensajes de una tutoría[m
+[32m+[m[32mconst getMensajesByTutoria = async (req, res) => {[m
+   try {[m
+[31m-    const { contenido, receptorId, tutoriaId } = req.body;[m
+[31m-    const emisorId = req.usuario.id;[m
+[31m-[m
+[31m-    // Validaciones básicas[m
+[31m-    if (!contenido || !receptorId || !tutoriaId) {[m
+[31m-      return res.status(400).json({[m
+[31m-        msg: "Faltan campos requeridos (contenido, receptorId, tutoriaId)"[m
+[31m-      });[m
+[31m-    }[m
+[31m-[m
+[31m-    const mensaje = await Mensaje.create({[m
+[31m-      contenido,[m
+[31m-      emisorId,[m
+[31m-      receptorId,[m
+[31m-      tutoriaId[m
+[31m-    });[m
+[31m-[m
+[31m-    const mensajeConDetalles = await Mensaje.findByPk(mensaje.id, {[m
+[32m+[m[32m    const { tutoriaId } = req.params;[m
+[32m+[m[32m    const mensajes = await Mensaje.findAll({[m
+[32m+[m[32m      where: { tutoria_id: tutoriaId },[m
+       include: [[m
+         { model: Usuario, as: 'emisor', attributes: ['id', 'nombre'] },[m
+         { model: Usuario, as: 'receptor', attributes: ['id', 'nombre'] }[m
+[31m-      ][m
+[32m+[m[32m      ],[m
+[32m+[m[32m      order: [['created_at', 'ASC']][m
+     });[m
+ [m
+[31m-    res.status(201).json(mensajeConDetalles);[m
+[32m+[m[32m    res.json(mensajes);[m
+   } catch (error) {[m
+[31m-    console.error('Error al enviar mensaje:', error);[m
+[31m-    res.status(500).json({[m
+[31m-      msg: "Error al enviar mensaje",[m
+[31m-      error: error.message[m
+[32m+[m[32m    console.error('Error al obtener mensajes:', error);[m
+[32m+[m[32m    res.status(500).json({[m[41m [m
+[32m+[m[32m      msg: 'Error al obtener mensajes',[m
+[32m+[m[32m      error: error.message[m[41m [m
+     });[m
+   }[m
+ };[m
+ [m
+[31m-const obtenerMensajes = async (req, res) => {[m
+[32m+[m[32m// Enviar un mensaje[m
+[32m+[m[32mconst enviarMensaje = async (req, res) => {[m
+   try {[m
+[31m-    const { tutoriaId, otroUsuarioId } = req.query;[m
+[31m-    const usuarioId = req.usuario.id;[m
+[32m+[m[32m    const { tutoriaId, receptorId, contenido } = req.body;[m
+[32m+[m[32m    const emisorId = req.usuario.id;[m
+ [m
+[31m-    const mensajes = await Mensaje.findAll({[m
+[31m-      where: {[m
+[31m-        tutoriaId,[m
+[31m-        [Op.or]: [[m
+[31m-          { emisorId: usuarioId, receptorId: otroUsuarioId },[m
+[31m-          { emisorId: otroUsuarioId, receptorId: usuarioId }[m
+[31m-        ][m
+[31m-      },[m
+[32m+[m[32m    const mensaje = await Mensaje.create({[m
+[32m+[m[32m      contenido,[m
+[32m+[m[32m      emisor_id: emisorId,[m
+[32m+[m[32m      receptor_id: receptorId,[m
+[32m+[m[32m      tutoria_id: tutoriaId,[m
+[32m+[m[32m      leido: false[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    const mensajeCompleto = await Mensaje.findByPk(mensaje.id, {[m
+       include: [[m
+         { model: Usuario, as: 'emisor', attributes: ['id', 'nombre'] },[m
+         { model: Usuario, as: 'receptor', attributes: ['id', 'nombre'] }[m
+[31m-      ],[m
+[31m-      order: [['createdAt', 'ASC']][m
+[32m+[m[32m      ][m
+     });[m
+ [m
+[31m-    res.json(mensajes);[m
+[32m+[m[32m    res.status(201).json(mensajeCompleto);[m
+   } catch (error) {[m
+[31m-    console.error('Error al obtener mensajes:', error);[m
+[31m-    res.status(500).json({[m
+[31m-      msg: "Error al obtener mensajes",[m
+[31m-      error: error.message[m
+[32m+[m[32m    console.error('Error al enviar mensaje:', error);[m
+[32m+[m[32m    res.status(500).json({[m[41m [m
+[32m+[m[32m      msg: 'Error al enviar mensaje',[m
+[32m+[m[32m      error: error.message[m[41m [m
+     });[m
+   }[m
+ };[m
+ [m
+[32m+[m[32m// Marcar mensajes como leídos[m
+ const marcarComoLeido = async (req, res) => {[m
+   try {[m
+     const { mensajeId } = req.params;[m
+[31m-    const usuarioId = req.usuario.id;[m
+[31m-[m
+     const mensaje = await Mensaje.findByPk(mensajeId);[m
+[31m-    [m
+[31m-    if (!mensaje) {[m
+[31m-      return res.status(404).json({ msg: "Mensaje no encontrado" });[m
+[31m-    }[m
+ [m
+[31m-    if (mensaje.receptorId !== usuarioId) {[m
+[31m-      return res.status(403).json({ msg: "No autorizado" });[m
+[32m+[m[32m    if (!mensaje) {[m
+[32m+[m[32m      return res.status(404).json({ msg: 'Mensaje no encontrado' });[m
+     }[m
+ [m
+     await mensaje.update({ leido: true });[m
+[31m-[m
+[31m-    res.json({ msg: "Mensaje marcado como leído" });[m
+[32m+[m[32m    res.json({ msg: 'Mensaje marcado como leído' });[m
+   } catch (error) {[m
+     console.error('Error al marcar mensaje como leído:', error);[m
+[31m-    res.status(500).json({[m
+[31m-      msg: "Error al actualizar mensaje",[m
+[31m-      error: error.message[m
+[32m+[m[32m    res.status(500).json({[m[41m [m
+[32m+[m[32m      msg: 'Error al marcar mensaje como leído',[m
+[32m+[m[32m      error: error.message[m[41m [m
+     });[m
+   }[m
+ };[m
+ [m
+ module.exports = {[m
+[32m+[m[32m  getMensajesByTutoria,[m
+   enviarMensaje,[m
+[31m-  obtenerMensajes,[m
+   marcarComoLeido[m
+ };[m
+\ No newline at end of file[m
+[1mdiff --git a/tutoria_backend/controllers/tutoriadosController.js b/tutoria_backend/controllers/tutoriadosController.js[m
+[1mindex 759fc09..d954ca0 100644[m
+[1m--- a/tutoria_backend/controllers/tutoriadosController.js[m
+[1m+++ b/tutoria_backend/controllers/tutoriadosController.js[m
+[36m@@ -1,26 +1,50 @@[m
+[31m-import pool from "../database/conexion.js";[m
+[31m-[m
+[31m-// Controlador: Obtener tutoriados por tutor[m
+[31m-export const obtenerTutoriadosPorTutor = async (req, res) => {[m
+[31m-  const { idTutor } = req.params;[m
+[32m+[m[32mconst { Usuario, Tutoria, sequelize } = require('../models');[m
+ [m
+[32m+[m[32mconst getTutoriadosByTutor = async (req, res) => {[m
+   try {[m
+[31m-    // Consulta SQL (ajusta los nombres de tablas y columnas si difieren)[m
+[31m-    const result = await pool.query([m
+[31m-      `SELECT t.id, t.nombre, t.correo, t.carrera, t.semestre[m
+[31m-       FROM tutoriados t[m
+[31m-       INNER JOIN tutorias tu ON t.id = tu.id_tutoriado[m
+[31m-       WHERE tu.id_tutor = $1`,[m
+[31m-      [idTutor][m
+[31m-    );[m
+[32m+[m[32m    const { id } = req.params;[m
+[32m+[m[32m    console.log('🔍 Buscando tutoriados para el tutor:', id);[m
+[32m+[m
+[32m+[m[32m    // Obtener todos los tutoriados asignados a las tutorías donde este usuario es tutor[m
+[32m+[m[32m    const tutoriados = await Usuario.findAll({[m
+[32m+[m[32m      attributes: ['id', 'nombre', 'correo'],[m
+[32m+[m[32m      include: [{[m
+[32m+[m[32m        model: Tutoria,[m
+[32m+[m[32m        as: 'tutoriasComoTutoriado',[m
+[32m+[m[32m        required: true,[m
+[32m+[m[32m        attributes: ['id', 'materia', 'fecha', 'estado'],[m
+[32m+[m[32m        include:
