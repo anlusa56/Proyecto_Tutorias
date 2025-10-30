@@ -1,10 +1,18 @@
+/* ===== Contenedor Principal ===== */
 .home-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: #0a0a0a; /* base oscura */
+  color: #fff;
+  font-family: 'Playfair Display', serif; /* más elegante y sofisticada */
 }
 
+/* ===== Hero Section ===== */
 .hero-section {
+  position: relative;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -12,46 +20,89 @@
   align-items: center;
   text-align: center;
   padding: 2rem;
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)),
-              #1a1a1a;
+  overflow: hidden;
+  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.95)), #0a0a0a;
   color: #fff;
 }
 
+/* Líneas abstractas doradas animadas */
+.hero-section::before,
+.hero-section::after {
+  content: "";
+  position: absolute;
+  width: 250%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ffd700,
+    #fff8b0,
+    #ffd700,
+    transparent
+  );
+  opacity: 0.6;
+  animation: move-lines 14s linear infinite;
+}
+
+.hero-section::before { top: 35%; transform: rotate(12deg); }
+.hero-section::after { top: 65%; transform: rotate(-10deg); animation-duration: 20s; animation-delay: 3s; opacity: 0.4; }
+
+@keyframes move-lines {
+  0% { transform: translateX(-50%) rotate(var(--angle, 10deg)); }
+  100% { transform: translateX(50%) rotate(var(--angle, 10deg)); }
+}
+
+/* ===== Hero Content ===== */
 .hero-content {
   max-width: 800px;
   margin: 0 auto;
+  z-index: 2;
 }
 
 .hero-content h1 {
-  font-size: 3.5rem;
-  color: #FFD700;
+  font-family: 'Cinzel', serif;
+  font-size: 4rem;
+  font-weight: 900;
   margin-bottom: 1.5rem;
-  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 1.1;
+  background: linear-gradient(145deg, #FFD700 0%, #FFE680 40%, #FFD700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.25), 0 0 10px rgba(255, 215, 0, 0.5);
+  -webkit-text-stroke: 0.5px rgba(255,215,0,0.8);
 }
 
 .hero-content p {
   font-size: 1.2rem;
+  line-height: 1.6;
   color: #fff;
   margin-bottom: 2rem;
-  line-height: 1.6;
 }
 
+/* Hero Buttons */
 .hero-buttons {
   display: flex;
   gap: 1.5rem;
   justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid #FFD700;
+  text-transform: uppercase;
+  font-family: 'Playfair Display', serif; /* nueva tipografía elegante */
 }
 
 .btn-primary {
   background: #FFD700;
   color: #000;
-  padding: 1rem 2rem;
-  border: 2px solid #FFD700;
-  border-radius: 30px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -63,13 +114,6 @@
 .btn-secondary {
   background: transparent;
   color: #FFD700;
-  padding: 1rem 2rem;
-  border: 2px solid #FFD700;
-  border-radius: 30px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
 .btn-secondary:hover {
@@ -78,6 +122,7 @@
   transform: translateY(-3px);
 }
 
+/* ===== Features Section ===== */
 .features-section {
   padding: 5rem 2rem;
   background: #242424;
@@ -86,8 +131,10 @@
 .features-section h2 {
   text-align: center;
   color: #FFD700;
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   margin-bottom: 3rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
 }
 
 .features-grid {
@@ -103,12 +150,13 @@
   padding: 2rem;
   border-radius: 12px;
   text-align: center;
-  border: 1px solid rgba(255, 215, 0, 0.1);
-  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .feature-card:hover {
   transform: translateY(-10px);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 .feature-card i {
@@ -118,9 +166,30 @@
 }
 
 .feature-card h3 {
-  color: #FFD700;
-  font-size: 1.5rem;
+  font-family: 'Cinzel', serif;
+  font-weight: 800;
+  font-size: 1.8rem;
   margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #FFD700 0%, #FFC300 50%, #FFB700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 1px 0 #b38f00, 0 2px 4px rgba(0,0,0,0.5), 0 0 6px rgba(255,215,0,0.8);
+  position: relative;
+}
+
+.feature-card h3::after {
+  content: '';
+  position: absolute;
+  left: 20%;
+  top: 20%;
+  width: 60%;
+  height: 30%;
+  background: rgba(255, 255, 255, 0.2);
+  filter: blur(6px);
+  transform: rotate(-25deg);
+  pointer-events: none;
+  border-radius: 50%;
 }
 
 .feature-card p {
@@ -128,44 +197,9 @@
   line-height: 1.6;
 }
 
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #1a1a1a;
-  min-width: 200px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-  border-radius: 8px;
-  padding: 8px;
-  z-index: 1;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-.dropdown-content button {
-  width: 100%;
-  padding: 12px 16px;
-  background: transparent;
-  border: none;
-  color: #FFD700;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-radius: 4px;
-}
-
-.dropdown-content button:hover {
-  background-color: rgba(255, 215, 0, 0.1);
-}
-
+/* ===== Benefits Section ===== */
 .benefits-section {
-  background: #242424;
+  background: #000000; /* mismo que sección de features */
   padding: 5rem 2rem;
 }
 
@@ -182,11 +216,52 @@
   padding: 2rem;
   border-radius: 12px;
   border: 1px solid #FFD700;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.benefit-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+/* ===== Título principal de la sección Beneficios ===== */
+.benefits-section h2 {
+  text-align: center;
+  color: #FFD700; /* mismo color dorado que "Cómo funciona" */
+  font-size: 2.8rem; /* mismo tamaño */
+  margin-bottom: 3rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); /* mismo brillo sutil */
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.05em;
+}
+
+
 .benefit-card h3 {
-  color: #FFD700;
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 2.8rem; /* igual que features-section h2 */
+  color: #FFD700; /* igual que features-section h2 */
   margin-bottom: 1rem;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #FFD700 0%, #FFC300 50%, #FFB700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 1px 0 #b38f00, 0 2px 5px rgba(0,0,0,0.6), 0 0 8px rgba(255, 215, 0, 0.9);
+  position: relative;
+}
+
+.benefit-card h3::after {
+  content: '';
+  position: absolute;
+  left: 20%;
+  top: 20%;
+  width: 60%;
+  height: 30%;
+  background: rgba(255, 255, 255, 0.3);
+  filter: blur(6px);
+  transform: rotate(-25deg);
+  pointer-events: none;
+  border-radius: 50%;
 }
 
 .benefit-card ul {
@@ -208,17 +283,35 @@
   color: #FFD700;
 }
 
-@media (max-width: 768px) {
-  .hero-content h1 {
-    font-size: 2.5rem;
-  }
-
-  .hero-buttons {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
+/* ===== Dropdown / Login / Register ===== */
+.dropdown {
+  position: relative;
+  display: inline-block;
 }
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #1a1a1a;
+  min-width: 200px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 8px;
+  z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content button {
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  color: #FFD700;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'Playfair Display', serif; /* tipografía elegante para login/register */
+  transition: all 0.3s ease;
+  border-radius

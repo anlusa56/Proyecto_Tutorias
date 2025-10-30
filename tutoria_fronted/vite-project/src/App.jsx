@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import Registro from "./pages/Registro";
 import ProfesorMenu from "./components/ProfesorMenu";
 import TutorMenu from "./components/TutorMenu";
+import AdminMenu from "./components/AdminMenu";
 import TutoriadoMenu from "./components/TutoriadoMenu";
 import EstudianteTutoriadoLayout from "./components/EstudianteTutoriadoLayout";
 import EstudianteTutoriadoHome from "./components/EstudianteTutoriadoHome";
