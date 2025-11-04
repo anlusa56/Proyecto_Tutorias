@@ -1,24 +1,30 @@
+/* 🌙 CONTENEDOR PRINCIPAL */
 .menu-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #1a1a1a;
+  background: radial-gradient(circle at top left, #0d0d0d, #1a1a1a 40%, #000);
+  color: #fff;
+  font-family: "Poppins", sans-serif;
 }
 
+/* 🧭 NAVBAR */
 .menu-nav {
   background: linear-gradient(90deg, #000, #111, #000);
-  padding: 1rem;
+  padding: 1rem 2rem;
   border-bottom: 2px solid #FFD700;
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
-
 
 .menu-nav ul {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
-  gap: 20px;
+  gap: 25px;
   align-items: center;
 }
 
@@ -26,99 +32,151 @@
   margin-left: auto;
 }
 
+/* ✨ LINKS NAV */
 .menu-nav a {
   text-decoration: none;
   color: #FFD700;
   font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 8px 18px;
+  border-radius: 6px;
   transition: all 0.3s ease;
   border: 1px solid transparent;
+  letter-spacing: 0.5px;
 }
 
-.menu-nav a:hover, .menu-nav a.active {
-  background-color: rgba(255, 215, 0, 0.1);
+.menu-nav a:hover,
+.menu-nav a.active {
+  background-color: rgba(255, 215, 0, 0.15);
   border-color: #FFD700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+  transform: translateY(-2px);
 }
 
+/* 🚪 BOTÓN SALIR */
 .logout-button {
   background-color: #FFD700;
   color: #000;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 8px 18px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
   font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .logout-button:hover {
   background-color: #f1c40f;
-  transform: translateY(-2px);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
+/* 🧱 CONTENIDO */
 .menu-content {
   flex: 1;
   padding: 2rem;
-  margin: 20px auto;
-  background-color: #242424;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  margin: 30px auto;
+  background-color: rgba(36, 36, 36, 0.95);
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
   max-width: 1200px;
   width: calc(100% - 4rem);
-  color: #fff;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.8s ease-in-out;
 }
 
+/* 🪶 SECCIONES */
 .section-container {
   padding: 2rem;
   background: #2a2a2a;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
   margin-bottom: 2rem;
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.section-container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(255, 215, 0, 0.15);
+}
+
+/* 🏷️ TÍTULO DE SECCIÓN */
 .section-title {
   color: #FFD700;
-  margin-bottom: 2rem;
-  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
+/* ⚠️ MENSAJE DE ERROR */
 .error-message {
   color: #ff6b6b;
   padding: 1rem;
-  border-radius: 8px;
-  background-color: rgba(255, 107, 107, 0.1);
+  border-radius: 10px;
+  background-color: rgba(255, 107, 107, 0.15);
   border: 1px solid #ff6b6b;
-  margin: 1rem 0;
+  margin: 1.5rem 0;
+  text-align: center;
+  font-weight: 500;
 }
 
+/* 🎴 GRID DE TUTORÍAS */
 .tutorias-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
   padding: 20px 0;
 }
 
+/* 📘 TARJETA DE TUTORÍA */
 .tutoria-card {
-  background: rgb(0, 0, 0);
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: #000;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.tutoria-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(255, 215, 0, 0.25);
+}
+
+/* 📱 RESPONSIVE */
 @media (max-width: 768px) {
   .menu-nav ul {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .menu-nav li {
     width: 100%;
   }
-  
+
   .menu-nav a {
     display: block;
     text-align: center;
+  }
+
+  .menu-content {
+    width: calc(100% - 2rem);
+    margin: 15px auto;
+    padding: 1.5rem;
+  }
+}
+
+/* ✨ ANIMACIÓN DE ENTRADA */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

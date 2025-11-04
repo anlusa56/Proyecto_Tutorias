@@ -1,118 +1,148 @@
+/* 🖤 Contenedor principal del chat */
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 500px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #fff;
-  margin: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  background: rgba(20, 20, 20, 0.9);
+  margin: 25px auto;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  color: #fff;
 }
 
+/* 💬 Header */
 .chat-header {
-  padding: 15px;
-  border-bottom: 1px solid #ddd;
-  background-color: #f8f9fa;
-  border-radius: 8px 8px 0 0;
+  padding: 15px 20px;
+  background: linear-gradient(90deg, #111, #222);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .chat-header h3 {
   margin: 0;
-  color: #333;
+  font-size: 1.3rem;
+  color: #FFD700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  font-family: "Poppins", sans-serif;
 }
 
+/* 🧾 Mensajes */
 .chat-messages {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 15px;
+  padding: 15px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  background: linear-gradient(180deg, #0d0d0d, #1a1a1a);
 }
 
+/* 🎭 Mensajes base */
 .mensaje {
   max-width: 70%;
-  margin: 5px 0;
   display: flex;
+  position: relative;
 }
 
 .mensaje-enviado {
   align-self: flex-end;
+  justify-content: flex-end;
 }
 
 .mensaje-recibido {
   align-self: flex-start;
+  justify-content: flex-start;
 }
 
 .mensaje-contenido {
   padding: 10px 15px;
   border-radius: 15px;
-  background-color: #f0f0f0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  word-wrap: break-word;
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 
+/* 💎 Estilo de mensajes enviados */
 .mensaje-enviado .mensaje-contenido {
-  background-color: #007bff;
-  color: white;
+  background: linear-gradient(135deg, #FFD700, #e6b800);
+  color: #000;
+  border-top-right-radius: 0;
 }
 
+/* 🌙 Estilo de mensajes recibidos */
 .mensaje-recibido .mensaje-contenido {
-  background-color: #e9ecef;
-  color: #333;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.1);
+  color: #fff;
+  border-top-left-radius: 0;
 }
 
-.mensaje-contenido p {
-  margin: 0;
-  padding: 0;
-}
-
+/* 🕓 Tiempos */
 .mensaje-contenido small {
   display: block;
-  font-size: 0.75em;
-  margin-top: 5px;
-  opacity: 0.8;
+  font-size: 0.7em;
+  opacity: 0.7;
+  margin-top: 4px;
+  text-align: right;
 }
 
+/* 🧠 Input */
 .chat-input {
   display: flex;
   padding: 15px;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid rgba(255, 215, 0, 0.2);
+  background: rgba(30, 30, 30, 0.95);
   gap: 10px;
-  background-color: #f8f9fa;
-  border-radius: 0 0 8px 8px;
 }
 
 .chat-input input {
   flex-grow: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 25px;
+  color: #fff;
+  font-size: 1rem;
   outline: none;
+  transition: 0.3s;
 }
 
 .chat-input input:focus {
-  border-color: #007bff;
+  border-color: #FFD700;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.3);
 }
 
+/* 🚀 Botón enviar */
 .chat-input button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
+  padding: 10px 22px;
+  background: linear-gradient(90deg, #FFD700, #e6b800);
+  color: #000;
+  font-weight: 600;
   border: none;
-  border-radius: 20px;
+  border-radius: 25px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
 }
 
 .chat-input button:hover {
-  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
 }
 
+/* ⚠️ Mensaje de error */
 .error-message {
-  color: #dc3545;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 4px;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
+  color: #ff4d4d;
+  background: rgba(255, 77, 77, 0.1);
+  border: 1px solid rgba(255, 77, 77, 0.3);
+  padding: 12px;
+  border-radius: 6px;
+  margin: 10px;
+  text-align: center;
+  font-weight: 500;
 }

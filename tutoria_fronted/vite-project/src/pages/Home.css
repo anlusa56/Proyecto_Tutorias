@@ -1,37 +1,45 @@
 /* ===== Contenedor Principal ===== */
 .home-container {
+  width: 100vw;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
-  background: #0a0a0a; /* base oscura */
-  color: #fff;
-  font-family: 'Playfair Display', serif; /* más elegante y sofisticada */
+  background: var(--background);
+  color: var(--text);
+  font-family: 'Playfair Display', serif;
+  overflow: visible; /* ✅ evita que se corte el hero */
 }
 
-/* ===== Hero Section ===== */
+/* ===== HERO SECTION ===== */
 .hero-section {
   position: relative;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 2rem;
-  overflow: hidden;
-  background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.95)), #0a0a0a;
-  color: #fff;
+  padding: 8rem 20px 4rem; /* ✅ más espacio arriba y abajo */
+  background: linear-gradient(
+              to bottom,
+              rgba(0, 0, 0, 0.85),
+              rgba(0, 0, 0, 0.95)
+            ),
+            url('../assets/hero-bg.jpg') center/cover no-repeat;
+  overflow: visible;
+  z-index: 0;
 }
 
-/* Líneas abstractas doradas animadas */
+/* ===== Líneas decorativas animadas ===== */
 .hero-section::before,
 .hero-section::after {
   content: "";
   position: absolute;
   width: 250%;
-  height: 1px;
+  height: 2px;
   background: linear-gradient(
     90deg,
     transparent,
@@ -42,26 +50,39 @@
   );
   opacity: 0.6;
   animation: move-lines 14s linear infinite;
+  z-index: 1;
+  pointer-events: none;
 }
 
-.hero-section::before { top: 35%; transform: rotate(12deg); }
-.hero-section::after { top: 65%; transform: rotate(-10deg); animation-duration: 20s; animation-delay: 3s; opacity: 0.4; }
+.hero-section::before {
+  top: 35%;
+  transform: rotate(12deg);
+}
+
+.hero-section::after {
+  top: 65%;
+  transform: rotate(-10deg);
+  animation-duration: 20s;
+  animation-delay: 3s;
+  opacity: 0.4;
+}
 
 @keyframes move-lines {
   0% { transform: translateX(-50%) rotate(var(--angle, 10deg)); }
   100% { transform: translateX(50%) rotate(var(--angle, 10deg)); }
 }
 
-/* ===== Hero Content ===== */
+/* ===== HERO CONTENT ===== */
 .hero-content {
-  max-width: 800px;
+  position: relative;
+  max-width: 90%;
   margin: 0 auto;
-  z-index: 2;
+  z-index: 5; /* ✅ encima de las líneas */
 }
 
 .hero-content h1 {
   font-family: 'Cinzel', serif;
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 900;
   margin-bottom: 1.5rem;
   letter-spacing: 1px;
@@ -69,7 +90,7 @@
   background: linear-gradient(145deg, #FFD700 0%, #FFE680 40%, #FFD700 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.25), 0 0 10px rgba(255, 215, 0, 0.5);
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.25), 0 0 12px rgba(255, 215, 0, 0.6);
   -webkit-text-stroke: 0.5px rgba(255,215,0,0.8);
 }
 
@@ -78,9 +99,10 @@
   line-height: 1.6;
   color: #fff;
   margin-bottom: 2rem;
+  text-shadow: 0 0 6px rgba(0,0,0,0.4);
 }
 
-/* Hero Buttons */
+/* ===== HERO BUTTONS ===== */
 .hero-buttons {
   display: flex;
   gap: 1.5rem;
@@ -88,7 +110,8 @@
   flex-wrap: wrap;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
   padding: 1rem 2rem;
   font-size: 1.1rem;
   font-weight: 600;
@@ -97,7 +120,8 @@
   transition: all 0.3s ease;
   border: 2px solid #FFD700;
   text-transform: uppercase;
-  font-family: 'Playfair Display', serif; /* nueva tipografía elegante */
+  font-family: 'Playfair Display', serif;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
 }
 
 .btn-primary {
@@ -109,6 +133,7 @@
   background: transparent;
   color: #FFD700;
   transform: translateY(-3px);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
 }
 
 .btn-secondary {
@@ -120,6 +145,7 @@
   background: #FFD700;
   color: #000;
   transform: translateY(-3px);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
 }
 
 /* ===== Features Section ===== */
@@ -199,7 +225,7 @@
 
 /* ===== Benefits Section ===== */
 .benefits-section {
-  background: #000000; /* mismo que sección de features */
+  background: #000000;
   padding: 5rem 2rem;
 }
 
@@ -223,24 +249,24 @@
   transform: translateY(-8px);
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
+
 /* ===== Título principal de la sección Beneficios ===== */
 .benefits-section h2 {
   text-align: center;
-  color: #FFD700; /* mismo color dorado que "Cómo funciona" */
-  font-size: 2.8rem; /* mismo tamaño */
+  color: #FFD700;
+  font-size: 2.8rem;
   margin-bottom: 3rem;
   font-weight: 700;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); /* mismo brillo sutil */
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
   font-family: 'Cinzel', serif;
   letter-spacing: 0.05em;
 }
 
-
 .benefit-card h3 {
   font-family: 'Cinzel', serif;
   font-weight: 900;
-  font-size: 2.8rem; /* igual que features-section h2 */
-  color: #FFD700; /* igual que features-section h2 */
+  font-size: 2.8rem;
+  color: #FFD700;
   margin-bottom: 1rem;
   letter-spacing: 0.08em;
   background: linear-gradient(135deg, #FFD700 0%, #FFC300 50%, #FFB700 100%);
@@ -312,6 +338,7 @@
   color: #FFD700;
   text-align: left;
   cursor: pointer;
-  font-family: 'Playfair Display', serif; /* tipografía elegante para login/register */
+  font-family: 'Playfair Display', serif;
   transition: all 0.3s ease;
-  border-radius
+  border-radius: 6px;
+}

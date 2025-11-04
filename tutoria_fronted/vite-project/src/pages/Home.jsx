@@ -22,7 +22,7 @@ export default function Home() {
               </div>
             </div>
             <div className="dropdown">
-              <button className="btn-secondary dropdown-toggle">Registrarse</button>
+              
               <div className="dropdown-content">
                 <button onClick={() => navigate('/registro?rol=estudiante_tutor')}>Como Tutor (Grado 11°)</button>
                 <button onClick={() => navigate('/registro?rol=estudiante_tutoriado')}>Como Estudiante</button>

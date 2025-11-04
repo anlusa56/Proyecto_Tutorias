@@ -105,7 +105,6 @@
 .tutoria-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
-  background: linear-gradient(145deg, #dbf300, #ffffff, #fffb00);
 }
 
 

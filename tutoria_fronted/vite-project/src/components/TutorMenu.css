@@ -1,58 +1,109 @@
-.avances-form {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* 🌟 SECCIÓN AVANCES - DISEÑO ELEGANTE Y MODERNO */
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #0e0e0e, #1b1b1b);
+  color: #fff;
 }
 
+/* 📋 FORMULARIO PRINCIPAL */
+.avances-form {
+  max-width: 650px;
+  margin: 40px auto;
+  padding: 2rem;
+  background: rgba(34, 34, 34, 0.95);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.avances-form h2 {
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #FFD700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+}
+
+/* 🎯 CAMPOS DEL FORMULARIO */
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 1.6rem;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
-  color: #333;
-  font-weight: 500;
+  color: #FFD700;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 10px 14px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
 }
 
 .form-group textarea {
-  min-height: 100px;
+  min-height: 120px;
   resize: vertical;
 }
 
-.success-message {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  padding: 12px;
-  border-radius: 4px;
-  margin-bottom: 20px;
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #FFD700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.25);
+  transform: scale(1.01);
 }
 
+/* ✅ MENSAJE DE ÉXITO */
+.success-message {
+  background: rgba(46, 213, 115, 0.1);
+  color: #2ed573;
+  border: 1px solid #2ed573;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* 🧩 RETROALIMENTACIONES */
 .retroalimentaciones-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  padding: 20px 0;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.8rem;
+  margin: 2rem 0;
 }
 
 .retroalimentacion-card {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: linear-gradient(160deg, #1a1a1a, #111);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 215, 0, 0.25);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.retroalimentacion-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.2);
 }
 
 .retroalimentacion-header {
@@ -64,87 +115,121 @@
 
 .retroalimentacion-header h3 {
   margin: 0;
-  color: #2c3e50;
+  font-size: 1.2rem;
+  color: #FFD700;
 }
 
 .fecha {
-  color: #666;
-  font-size: 14px;
+  color: #ccc;
+  font-size: 0.9rem;
 }
 
 .profesor-nombre {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 12px;
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
 }
 
 .retroalimentacion-content {
-  margin: 16px 0;
+  color: #e5e5e5;
   line-height: 1.6;
+  margin-bottom: 1rem;
 }
 
 .calificacion {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 12px;
-  border-top: 1px solid #eee;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 215, 0, 0.2);
 }
 
 .calificacion strong {
-  color: #2196f3;
-  font-size: 18px;
+  color: #4db8ff;
+  font-size: 1.1rem;
+}
+
+/* 🎓 TARJETAS DE TUTORÍAS */
+.tutorias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.8rem;
+  padding: 1.5rem 0;
 }
 
 .tutoria-card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  background: linear-gradient(160deg, #1a1a1a, #111);
+  border-radius: 12px;
+  padding: 1.8rem;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
-.chat-button {
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 10px;
-  align-self: flex-start;
-}
-
-.chat-button:hover {
-  background-color: #0056b3;
+.tutoria-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(255, 215, 0, 0.2);
 }
 
 .tutoria-card h3 {
-  color: #333;
-  margin: 0 0 10px 0;
+  color: #FFD700;
+  margin-bottom: 10px;
 }
 
 .tutoria-card p {
-  margin: 5px 0;
-  color: #666;
+  margin: 6px 0;
+  color: #ddd;
 }
 
-.tutorias-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  padding: 20px;
+/* 💬 BOTONES */
+.chat-button,
+.estado-button {
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding: 10px 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Estilos para las tarjetas que tienen el chat abierto */
-.tutoria-card:has(.chat-container) {
-  grid-column: 1 / -1;
-  width: 100%;
+/* 💬 CHAT */
+.chat-button {
+  background: linear-gradient(90deg, #2980b9, #3498db);
+  box-shadow: 0 3px 10px rgba(52, 152, 219, 0.25);
 }
 
+.chat-button:hover {
+  background: linear-gradient(90deg, #3498db, #5dade2);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+/* 🔥 ESTADOS */
+.acciones-tutoria {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.estado-button.iniciar {
+  background: linear-gradient(90deg, #f39c12, #f1c40f);
+ 
+}
+
+.estado-button.finalizar {
+  background: linear-gradient(90deg, #e8ff16, #fbff09d3);
+ 
+}
+
+.estado-button:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* 🔄 LOADING */
 .menu-content.loading {
   display: flex;
   flex-direction: column;
@@ -154,10 +239,10 @@
 }
 
 .loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  width: 45px;
+  height: 45px;
+  border: 4px solid #333;
+  border-top: 4px solid #FFD700;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -168,52 +253,20 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Estilos responsivos */
+/* ✨ ANIMACIÓN DE ENTRADA */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 📱 RESPONSIVE */
 @media (max-width: 768px) {
-  .retroalimentaciones-grid {
+  .retroalimentaciones-grid,
+  .tutorias-grid {
     grid-template-columns: 1fr;
   }
 
   .avances-form {
-    padding: 15px;
+    padding: 1.5rem;
   }
-}
-.acciones-tutoria {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.estado-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.estado-button.iniciar {
-  background-color: #f39c12; /* naranja */
-}
-
-.estado-button.finalizar {
-  background-color: #9b59b6; /* morado */
-}
-
-.estado-button:hover {
-  opacity: 0.85;
-}
-
-.chat-button {
-  background-color: #2980b9;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.chat-button:hover {
-  background-color: #1f6392;
 }

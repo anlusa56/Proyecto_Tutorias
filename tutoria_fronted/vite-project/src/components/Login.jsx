@@ -98,14 +98,7 @@ export default function Login({ setUsuario }) {
         )}
 
         <div className="nav-buttons">
-          <button 
-            type="button" 
-            className="register-btn"
-            onClick={() => navigate("/registro")}
-            disabled={loading}
-          >
-            Crear cuenta nueva
-          </button>
+          
           
           <button 
             type="button" 

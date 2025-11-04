@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import UsersPage from '../pages/UsersPage';
+
 import TutoriasPage from '../pages/TutoriasPage';
 import ReportesPage from '../pages/ReportesPage';
 import SolicitudesRegistro from '../pages/SolicitudesRegistro';
-import '../styles/MenuCommon.css';
 import './AdminMenu.css';
 
 function GestionUsuarios() {

@@ -36,19 +36,22 @@
   text-decoration: none;
   font-weight: bold;
 }
-
 .menu-nav button {
   background-color: #ff5252;
   border: none;
   color: #fff;
-  padding: 5px 10px;
+  border-radius: 6px; /* igual a los demás */
+  padding: 12px 16px; /* mismo tamaño que los otros botones */
+  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease; /* misma suavidad */
 }
 
 .menu-nav button:hover {
   background-color: #ff1744;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 82, 82, 0.3);
 }
 
 /* Contenido principal */
@@ -216,3 +219,4 @@
 .pago-button:hover {
   background-color: #27ae60;
 }
+
