@@ -15,14 +15,23 @@ module.exports = (sequelize, DataTypes) => {
     },
     calificacion: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        min: 0,
+        max: 10
+      }
     },
     observaciones: {
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     tutoriadoId: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'usuarios',
+        key: 'id'
+      }
     }
   }, {
     tableName: "avances",
@@ -30,7 +39,6 @@ module.exports = (sequelize, DataTypes) => {
     underscored: true
   });
 
-  // si hay relación, por ejemplo:
   Avance.associate = (models) => {
     Avance.belongsTo(models.Usuario, {
       as: "tutoriado",

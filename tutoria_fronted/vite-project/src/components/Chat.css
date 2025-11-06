@@ -4,15 +4,15 @@
   height: 500px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  background-color: #fff;
+  background-color: #000000;
   margin: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .chat-header {
   padding: 15px;
-  border-bottom: 1px solid #ddd;
-  background-color: #f8f9fa;
+  border-bottom: 1px solid #000000;
+  background-color: #000000;
   border-radius: 8px 8px 0 0;
 }
 
@@ -47,12 +47,12 @@
 .mensaje-contenido {
   padding: 10px 15px;
   border-radius: 15px;
-  background-color: #f0f0f0;
+  background-color: #000000;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .mensaje-enviado .mensaje-contenido {
-  background-color: #007bff;
+  background-color: #276ab3;
   color: white;
 }
 
@@ -76,27 +76,27 @@
 .chat-input {
   display: flex;
   padding: 15px;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid #000000;
   gap: 10px;
-  background-color: #f8f9fa;
+  background-color: #000000;
   border-radius: 0 0 8px 8px;
 }
 
 .chat-input input {
   flex-grow: 1;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #f3d31f;
   border-radius: 20px;
   outline: none;
 }
 
 .chat-input input:focus {
-  border-color: #007bff;
+  border-color: #757f8a;
 }
 
 .chat-input button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #cac718;
   color: white;
   border: none;
   border-radius: 20px;
@@ -105,7 +105,7 @@
 }
 
 .chat-input button:hover {
-  background-color: #0056b3;
+  background-color: #929017;
 }
 
 .error-message {

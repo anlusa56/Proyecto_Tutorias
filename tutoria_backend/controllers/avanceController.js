@@ -1,4 +1,4 @@
-const { Avance } = require("../models");
+const { Avance, Usuario } = require("../models");
 
 exports.crearAvance = async (req, res) => {
   try {
@@ -17,16 +17,50 @@ exports.crearAvance = async (req, res) => {
       observaciones
     });
 
-    res.status(201).json(nuevoAvance);
+    const avanceCompleto = await Avance.findByPk(nuevoAvance.id, {
+      include: [
+        {
+          model: Usuario,
+          as: 'tutoriado',
+          attributes: ['id', 'nombre']
+        }
+      ]
+    });
+
+    res.status(201).json(avanceCompleto);
   } catch (error) {
     console.error("Error al crear avance:", error);
-    res.status(500).json({ msg: "Error al crear avance" });
+    res.status(500).json({ 
+      msg: "Error al crear avance",
+      error: error.message 
+    });
   }
 };
 
 exports.obtenerAvances = async (req, res) => {
   try {
-    const avances = await Avance.findAll();
+    const avances = await Avance.findAll({
+      include: [
+        {
+          model: Usuario,
+          as: 'tutoriado',
+          attributes: ['id', 'nombre']
+        },
+        {
+          model: Tutoria,
+          as: 'tutoria',
+          attributes: ['id', 'materia'],
+          include: [
+            {
+              model: Usuario,
+              as: 'tutoriasComoTutor',
+              attributes: ['id', 'nombre']
+            }
+          ]
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
     res.json(avances);
   } catch (error) {
     console.error("Error al obtener avances:", error);

@@ -6,7 +6,7 @@ require("dotenv").config({
 
 // Importar modelos y conexión a DB
 const { sequelize, Usuario, Tutoria, Mensaje } = require('./models');
-
+const configuracionRoutes = require('./routes/configuracion');
 const app = express();
 
 // Middlewares
@@ -22,6 +22,7 @@ app.use('/api/reportes', require('./routes/reporte.routes'));
 app.use('/api/tutoriados', require('./routes/tutoriadosRoutes'));
 app.use('/api/avances', require('./routes/avances'));
 app.use('/api/solicitudes', require('./routes/solicitudes'));
+app.use('/api/configuracion', require('./routes/configuracion'));
 
 const PORT = process.env.PORT || 4000;
 

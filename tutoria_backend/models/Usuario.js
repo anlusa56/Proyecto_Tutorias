@@ -36,8 +36,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'receptor_id',
         as: 'mensajesRecibidos'
       });
+      Usuario.hasMany(models.Avance, {
+        as: 'avances',
+        foreignKey: 'tutoriadoId',
+        onDelete: 'CASCADE', // opcional: borrar avances automáticamente
+}); 
     }
   }
+  
 
   Usuario.init({
     nombre: {

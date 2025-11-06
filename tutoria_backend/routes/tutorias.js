@@ -11,17 +11,18 @@ const {
     getTutoriasByTutor,
     getTutoriasByTutoriado,
     actualizarEstadoTutoria,
-    updateTutoriaEstado
+    updateTutoriaEstado,
+    cancelarTutoria
 } = require('../controllers/tutoriasController');
 
 const { validarJWT } = require('../middlewares/validar-jwt');
-
+const { cargarConfiguracion } = require('../middlewares/configuracion');
 // Aplicar validación JWT a todas las rutas
 router.use(validarJWT);
 
 // Rutas base
-router.post('/', crearTutoria);
-router.post('/asignar', asignarTutoria);
+router.post('/', cargarConfiguracion, crearTutoria);
+router.post('/asignar', cargarConfiguracion, asignarTutoria);
 router.get('/rol', getTutoriasByRol);
 router.get('/calendario', getCalendarioTutorias);
 
@@ -32,6 +33,7 @@ router.get('/tutoriado/:id', getTutoriasByTutoriado);
 router.put('/:id', actualizarTutoria);
 router.delete('/:id', eliminarTutoria);
 router.put('/:id/estado', actualizarEstadoTutoria);
+router.put('/:id/cancelar', cancelarTutoria);
 
 
 

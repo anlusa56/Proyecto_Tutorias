@@ -322,76 +322,6 @@ function SeguimientoTutorias({ usuario }) {
   );
 }
 
-
-
-function Reportes() {
-  const [estadisticas, setEstadisticas] = useState({
-    totalTutorias: 0,
-    tutoriasActivas: 0,
-    tutoriasCompletadas: 0,
-    tutoriasPorMateria: []
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const cargarEstadisticas = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:4000/api/reportes', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.msg);
-        setEstadisticas(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    cargarEstadisticas();
-  }, []);
-
-  if (loading) return <div className="loading">Cargando estadísticas...</div>;
-  if (error) return <div className="error-message">{error}</div>;
-
-  return (
-    <div className="section-container">
-      <h2>Reportes y Estadísticas</h2>
-      
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h3>Total Tutorías</h3>
-          <p className="stat-number">{estadisticas.totalTutorias}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Tutorías Activas</h3>
-          <p className="stat-number">{estadisticas.tutoriasActivas}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Tutorías Completadas</h3>
-          <p className="stat-number">{estadisticas.tutoriasCompletadas}</p>
-        </div>
-      </div>
-
-      <div className="materias-section">
-        <h3>Tutorías por Materia</h3>
-        <div className="materias-grid">
-          {estadisticas.tutoriasPorMateria.map(item => (
-            <div key={item.materia} className="materia-card">
-              <h4>{item.materia}</h4>
-              <p>{item.total} tutorías</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function ProfesorMenu({ usuario, onLogout }) {
   if (!usuario) return <Navigate to="/login" />;
 
@@ -399,10 +329,8 @@ export default function ProfesorMenu({ usuario, onLogout }) {
     <div className="menu-container">
       <nav className="menu-nav">
         <ul>
-          {/* Usar rutas absolutas agregando /profesor/ al inicio */}
           <li><Link to="/profesor/asignar">Asignar Tutorías</Link></li>
           <li><Link to="/profesor/seguimiento">Seguimiento</Link></li>
-          <li><Link to="/profesor/reportes">Reportes</Link></li>
           <li>
             <button onClick={onLogout} className="logout-button">
               Cerrar Sesión
@@ -413,7 +341,6 @@ export default function ProfesorMenu({ usuario, onLogout }) {
 
       <div className="menu-content">
         <Routes>
-          {/* Remover /profesor/ de las rutas en Routes ya que estas son relativas */}
           <Route path="/" element={<Navigate to="asignar" replace />} />
           <Route path="asignar" element={
             <AsignarTutorias 
@@ -423,8 +350,6 @@ export default function ProfesorMenu({ usuario, onLogout }) {
             />
           } />
           <Route path="seguimiento" element={<SeguimientoTutorias usuario={usuario} />} />
-          <Route path="reportes" element={<Reportes />} />
-          {/* Agregar ruta para capturar URLs incorrectas */}
           <Route path="*" element={<Navigate to="/profesor/asignar" replace />} />
         </Routes>
       </div>

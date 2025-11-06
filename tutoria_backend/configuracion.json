@@ -1,0 +1,10 @@
+{
+  "duracion_tutoria": 60,
+  "limite_estudiantes": 5,
+  "horas_anticipacion": 2,
+  "dias_cancelacion": 1,
+  "duracionTutoria": 65,
+  "limiteEstudiantes": 4,
+  "horasMinimas": 3,
+  "diasAntelacion": 1
+}

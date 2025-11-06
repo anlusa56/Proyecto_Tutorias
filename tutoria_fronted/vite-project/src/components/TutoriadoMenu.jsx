@@ -83,6 +83,7 @@ export default function TutoriadoMenu({ usuario, onLogout }) {
 
 function MisTutorias({ tutorias, error, usuario }) {
   const [tutoriaSeleccionada, setTutoriaSeleccionada] = useState(null);
+  const [, setTutorias] = useState(tutorias);
 
   // ✅ Función para marcar tutoría como pagada
   const marcarComoPagada = async (tutoriaId) => {
@@ -108,6 +109,41 @@ function MisTutorias({ tutorias, error, usuario }) {
     } catch (err) {
       console.error("❌ Error al marcar como pagada:", err);
       alert("Error al marcar tutoría como pagada");
+    }
+  };
+
+  const cancelarTutoria = async (tutoriaId) => {
+    if (!confirm('¿Estás seguro de que deseas cancelar esta tutoría?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:4000/api/tutorias/${tutoriaId}/cancelar`, {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+      });
+
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.msg || "Error al cancelar la tutoría");
+      }
+
+      // Actualizar estado local
+      setTutorias(prevTutorias => 
+        prevTutorias.map(t => 
+          t.id === tutoriaId ? { ...t, estado: "cancelada" } : t
+        )
+      );
+
+      alert("✅ Tutoría cancelada exitosamente");
+    } catch (err) {
+      console.error("❌ Error al cancelar tutoría:", err);
+      alert(err.message);
     }
   };
 
@@ -151,6 +187,15 @@ function MisTutorias({ tutorias, error, usuario }) {
                     onClick={() => marcarComoPagada(tutoria.id)}
                   >
                     Marcar como Pagada
+                  </button>
+                )}
+
+                {tutoria.estado === "programada" && (
+                  <button
+                    className="estado-button cancelar"
+                    onClick={() => cancelarTutoria(tutoria.id)}
+                  >
+                    Cancelar Tutoría
                   </button>
                 )}
               </div>

@@ -1,4 +1,3 @@
-
 .asignar-form label {
   color: #FFD700; /* Color dorado brillante para las etiquetas */
   font-weight: 500;
@@ -32,6 +31,26 @@
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
   color: #FFD700;
 }
+/* 🔥 Fuerza las letras amarillas a ser dorado brillante */
+* {
+  color: inherit;
+}
+
+
+span{
+  color: #FFD700 !important; /* Amarillo dorado fuerte */
+  opacity: 1 !important; /* Quita lo opaco */
+}
+
+
+
+/* Evita que elementos heredados o hover los apaguen */
+.menu-nav a,
+label {
+  color: #FFD700 !important;
+  opacity: 1 !important;
+}
+
 
 
 
@@ -52,10 +71,16 @@
   width: 100%;
   padding: 0.8rem;
   border: 1px solid #FFD700;
-  color: #000000;
+  background-color: #111; /* Fondo oscuro */
+  color: #FFD700; /* Texto dorado */
   border-radius: 8px;
   transition: all 0.3s ease;
 }
+.form-group select option {
+  background-color: #000; /* Fondo negro */
+  color: #FFD700; /* Letras doradas */
+}
+
 
 .form-group input:focus,
 .form-group select:focus,
@@ -86,11 +111,22 @@
 }
 
 .tutoria-card {
-  background: rgb(0, 0, 0);
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: linear-gradient(145deg, #000000, #1a1a1a); /* fondo negro con brillo */
+  border: 2px solid #FFD700; /* borde dorado */
+  color: #FFD700; /* texto dorado */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  text-align: center;
+  transition: all 0.3s ease;
 }
+
+.tutoria-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+
+}
+
 
 .tutoria-header {
   display: flex;
@@ -140,18 +176,23 @@
   margin: 1rem 0;
 }
 
-.materias-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 15px;
+.materia-card {
+  background: #000; /* fondo negro */
+  border: 2px solid #FFD700; /* borde dorado */
+  color: #FFD700; /* texto dorado */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+  text-align: center;
+  transition: all 0.3s ease;
 }
 
-.materia-card {
-  background: rgb(110, 104, 104);
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.materia-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  background-color: #111;
 }
+
 
 @media (max-width: 768px) {
   .form-row {
@@ -215,4 +256,74 @@
   margin-top: 10px;
   border-top: 1px solid #ddd;
   padding-top: 10px;
+}
+/* 🔸 Estilo mejorado para inputs, selects y textareas */
+.asignar-form input,
+.asignar-form select,
+.asignar-form textarea {
+  width: 100%;
+  background-color: #000; /* fondo negro */
+  color: #FFD700; /* texto dorado */
+  border: 2px solid #FFD700; /* borde dorado */
+  border-radius: 8px; /* esquinas suaves */
+  padding: 10px;
+  font-weight: 500;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); /* brillo dorado sutil */
+  transition: all 0.3s ease;
+}
+
+/* Efecto al hacer clic o enfocar */
+.asignar-form input:focus,
+.asignar-form select:focus,
+.asignar-form textarea:focus {
+  outline: none;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+  border-color: #ffea00; /* dorado más brillante */
+}
+
+/* Placeholder (texto gris dentro del campo vacío) */
+.asignar-form input::placeholder,
+.asignar-form textarea::placeholder {
+  color: rgba(255, 215, 0, 0.5);
+}
+
+/* Opciones dentro del select */
+.asignar-form option {
+  background-color: #000;
+  color: #FFD700;
+}
+.form-group label {
+  color: #FFD700;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+  letter-spacing: 0.5px;
+}
+header,
+.menu-nav,
+.admin-menu,
+.header,
+.navbar {
+  background-color: #000000 !important; /* fondo negro sólido */
+  color: #ffffff !important; /* texto blanco */
+  border-bottom: 3px solid #FFD700 !important; /* línea dorada abajo */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); /* pequeño brillo dorado opcional */
+}
+
+header h1,
+header h2,
+.menu-nav h1,
+.menu-nav h2,
+.admin-menu h1,
+.admin-menu h2 {
+  color: #FFD700 !important; /* títulos dorados */
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6); /* brillo sutil */
+}
+
+/* Remove all reportes-related styles */
+.reportes-grid,
+.reporte-card,
+.reporte-header,
+.reporte-content,
+.no-reportes {
+  display: none;
 }

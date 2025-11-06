@@ -112,15 +112,18 @@ export default function Chat({ tutoria, usuario }) {
         )}
       </div>
 
-      <div className="chat-input">
-        <input
-          type="text"
-          value={nuevoMensaje}
-          onChange={(e) => setNuevoMensaje(e.target.value)}
-          placeholder="Escribe un mensaje..."
-        />
-        <button onClick={enviarMensaje}>Enviar</button>
-      </div>
+      {/* Solo mostrar el panel de entrada si el usuario NO es profesor */}
+      {usuario.rol !== 'profesor' && (
+        <div className="chat-input">
+          <input
+            type="text"
+            value={nuevoMensaje}
+            onChange={(e) => setNuevoMensaje(e.target.value)}
+            placeholder="Escribe un mensaje..."
+          />
+          <button onClick={enviarMensaje}>Enviar</button>
+        </div>
+      )}
     </div>
   );
 }

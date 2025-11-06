@@ -1,4 +1,4 @@
-const { Usuario } = require('../models');
+const { Usuario, Tutoria, Mensaje, Avance} = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -118,13 +118,58 @@ const cambiarEstadoUsuario = async (req, res) => {
 
 
 // Eliminar usuario
+// Eliminar usuario
 const eliminarUsuario = async (req, res) => {
   try {
-    const usuario = await Usuario.destroy({ where: { id: req.params.id } });
+    const usuario = await Usuario.findByPk(req.params.id, {
+      include: [
+        { model: Tutoria, as: 'tutoriasComoTutor' },
+        { model: Tutoria, as: 'tutoriasComoTutoriado' },
+        { model: Tutoria, as: 'tutoriasComoProfesor' },
+        { model: Mensaje, as: 'mensajesEnviados' },
+        { model: Mensaje, as: 'mensajesRecibidos' },
+        { model: Avance, as: 'avances', foreignKey: 'tutoriadoId' } // incluimos avances
+      ]
+    });
+
     if (!usuario) return res.status(404).json({ msg: "Usuario no encontrado" });
-    res.json({ msg: "Usuario eliminado" });
+
+    // Borrar avances del usuario (si los hay)
+    if (usuario.avances && usuario.avances.length > 0) {
+      await Promise.all(usuario.avances.map(a => a.destroy()));
+    }
+
+    // Borrar mensajes enviados
+    if (usuario.mensajesEnviados && usuario.mensajesEnviados.length > 0) {
+      await Promise.all(usuario.mensajesEnviados.map(m => m.destroy()));
+    }
+
+    // Borrar mensajes recibidos
+    if (usuario.mensajesRecibidos && usuario.mensajesRecibidos.length > 0) {
+      await Promise.all(usuario.mensajesRecibidos.map(m => m.destroy()));
+    }
+
+    // Eliminar relaciones con tutorías como tutor y tutoriado
+    if (usuario.tutoriasComoTutor && usuario.tutoriasComoTutor.length > 0) {
+      await usuario.removeTutoriasComoTutor(usuario.tutoriasComoTutor);
+    }
+    if (usuario.tutoriasComoTutoriado && usuario.tutoriasComoTutoriado.length > 0) {
+      await usuario.removeTutoriasComoTutoriado(usuario.tutoriasComoTutoriado);
+    }
+
+    // Borrar tutorías como profesor
+    if (usuario.tutoriasComoProfesor && usuario.tutoriasComoProfesor.length > 0) {
+      await Promise.all(usuario.tutoriasComoProfesor.map(t => t.destroy()));
+    }
+
+    // Finalmente eliminar el usuario
+    await usuario.destroy();
+
+    res.json({ msg: "Usuario eliminado correctamente" });
+
   } catch (error) {
-    res.status(500).json({ msg: "Error al eliminar usuario" });
+    console.error("Error al eliminar usuario:", error);
+    res.status(500).json({ msg: "Error interno del servidor", error: error.message });
   }
 };
 

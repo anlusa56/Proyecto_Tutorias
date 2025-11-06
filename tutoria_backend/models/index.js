@@ -36,6 +36,9 @@ fs.readdirSync(__dirname)
     db[model.name] = model;
   });
 
+// Add Reporte model to db object
+db.Reporte = require('./Reporte')(sequelize, Sequelize.DataTypes);
+
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db);

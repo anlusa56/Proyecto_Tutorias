@@ -147,6 +147,41 @@ function MisTutorias({ tutorias, error, usuario, setTutorias }) {
     }
   };
 
+  const cancelarTutoria = async (tutoriaId) => {
+    if (!confirm('¿Estás seguro de que deseas cancelar esta tutoría?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`http://localhost:4000/api/tutorias/${tutoriaId}/cancelar`, {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+      });
+
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.msg || "Error al cancelar la tutoría");
+      }
+
+      // Actualizar estado local
+      setTutorias(prevTutorias => 
+        prevTutorias.map(t => 
+          t.id === tutoriaId ? { ...t, estado: "cancelada" } : t
+        )
+      );
+
+      alert("✅ Tutoría cancelada exitosamente");
+    } catch (err) {
+      console.error("❌ Error al cancelar tutoría:", err);
+      alert(err.message);
+    }
+  };
+
   return (
     <div className="tutorias-list">
       <h2>Mis Tutorías como Tutor</h2>
@@ -181,6 +216,14 @@ function MisTutorias({ tutorias, error, usuario, setTutorias }) {
                     onClick={() => cambiarEstadoTutoria(tutoria, "completada")}
                   >
                     Finalizar Tutoría
+                  </button>
+                )}
+                {tutoria.estado === "programada" && (
+                  <button
+                    className="estado-button cancelar"
+                    onClick={() => cancelarTutoria(tutoria.id)}
+                  >
+                    Cancelar Tutoría
                   </button>
                 )}
 
@@ -341,13 +384,26 @@ function RegistrarAvances({ tutoriados }) {
           <label>Estudiante:</label>
           <select
             value={formData.tutoriadoId}
-            onChange={(e) => setFormData({...formData, tutoriadoId: e.target.value})}
+            onChange={(e) => {
+              const tutoria = tutoriados.find(t => 
+                t.tutoriados?.[0]?.id === Number(e.target.value)
+              );
+              if (!tutoria) {
+                setError('No se encontró la tutoría asociada');
+                return;
+              }
+              setFormData({
+                ...formData,
+                tutoriadoId: e.target.value,
+                tutoria_id: tutoria.id // Asegurarnos de establecer tutoria_id
+              });
+            }}
             required
           >
             <option value="">Seleccionar estudiante</option>
             {tutoriados.map(tutoria => (
               <option key={tutoria.id} value={tutoria.tutoriados?.[0]?.id}>
-                {tutoria.tutoriados?.[0]?.nombre}
+                {tutoria.tutoriados?.[0]?.nombre} - {tutoria.materia}
               </option>
             ))}
           </select>
